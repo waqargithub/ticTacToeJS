@@ -1,0 +1,71 @@
+.grid {
+	background-color: orange;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.row {
+	position: relative;
+	width: 160px;
+	height: 55px;
+}
+
+.square {
+	width: 50px;
+	height: 50px;
+/*	padding: 1em; */
+	background-color: #eeffbb;
+	color: #006;
+	text-align: center;
+	vertical-align: middle;
+	float: left;
+}
+
+.text {
+	position: absolute;
+	left: 45%;
+	top: 45%;
+	width: 10px;
+	height: 10px;
+/*	padding: 1em; */
+	background-color: #eeffff;
+	color: #006;
+	text-align: center;
+	vertical-align: middle;
+	float: left;
+}
+
+.verticalLine {
+	width: 5px;
+	height: 50px;
+	float: left;
+	background-color: #006;
+}
+
+.horizontalLine {
+	width: 160px;
+	height: 5px;
+	background-color: #006;
+	clear: left;
+}
+
+.horizontalWin {
+	position: absolute;
+	width: 140px;
+	height: 5px;
+	left: 5%;
+	top: 50%;
+	margin-right: auto;
+	background-color: #600;
+	display: none;
+}
+
+.verticalWin {
+	width: 5px;
+	height: 120px;
+	background-color: #006;	
+}
+
+.clear {
+	clear: left;
+}
