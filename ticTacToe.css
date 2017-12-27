@@ -1,5 +1,5 @@
 #grid {
-	background-color: blue;
+	background-color: #888888;
 	padding: 5px;
 	display: inline-block;
 	position: absolute;
@@ -68,7 +68,8 @@
 	position: absolute;
 	width: 5px;
 	height: 150px;
-	left: 47.5%;
+/*	left: 47.5%; 14.5%; */
+	left: 82%;
 	top: 10%;
 	background-color: #600;
 	z-index: 1;

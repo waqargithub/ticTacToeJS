@@ -126,6 +126,16 @@ function checkGameOver(row, column) {
 		document.getElementById("row"+row+"Win").style.display = "block";
 		window.alert(rows[row].type + " wins!");
 	} else if (columns[column].count == 3) {
+		var left = "";
+		if (column == 0) {
+			left = "14.5%";
+		} else if (column == 1) {
+			left = "47.5%";
+		} else {
+			left = "82%";
+		}
+		document.getElementById("columnWin").style.left = left;	
+		document.getElementById("columnWin").style.display = "block";		
 		window.alert(columns[column].type + " wins!");
 	} else if (downDiagonal.count == 3) {
 		window.alert(downDiagonal.type + " wins!");
@@ -133,7 +143,6 @@ function checkGameOver(row, column) {
 		window.alert(upDiagonal.type + " wins!");
 	} else if (moveCounter == 9) {
 		window.alert("It's a tie!");
-//		document.getElementById('row0Horizontal').style.display = inline;
 	}
 }
 
