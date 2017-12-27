@@ -68,13 +68,42 @@
 	position: absolute;
 	width: 5px;
 	height: 150px;
-/*	left: 47.5%; 14.5%; */
+/*	left: 47.5%; 14.5%; 82% */
 	left: 82%;
 	top: 10%;
 	background-color: #600;
 	z-index: 1;
 	display: none;
 }
+
+#downDiagonalWin {
+	position: absolute;
+	width: 5px;
+	height: 160px;
+	left: 47.5%;
+	top: 0;
+	background-color: #600;
+	z-index: 1;
+    -ms-transform: rotate(-45deg); /* IE 9 */
+    -webkit-transform: rotate(-45deg); /* Safari */
+    transform: rotate(-45deg);	
+	display: none;
+}
+
+#upDiagonalWin {
+	position: absolute;
+	width: 5px;
+	height: 160px;
+	left: 47.5%;
+	top: 0;
+	background-color: #600;
+	z-index: 1;
+    -ms-transform: rotate(45deg); /* IE 9 */
+    -webkit-transform: rotate(45deg); /* Safari */
+    transform: rotate(45deg);	
+	display: none;
+}
+
 
 .clear {
 	clear: left;

@@ -138,8 +138,10 @@ function checkGameOver(row, column) {
 		document.getElementById("columnWin").style.display = "block";		
 		window.alert(columns[column].type + " wins!");
 	} else if (downDiagonal.count == 3) {
+		document.getElementById('downDiagonalWin').style.display = "block";
 		window.alert(downDiagonal.type + " wins!");
 	} else if (upDiagonal.count == 3) {
+		document.getElementById('upDiagonalWin').style.display = "block";
 		window.alert(upDiagonal.type + " wins!");
 	} else if (moveCounter == 9) {
 		window.alert("It's a tie!");
