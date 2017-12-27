@@ -1,3 +1,6 @@
+var xWins = 0;
+var yWins = 0;
+var ties = 0;
 var currentLetter = true;
 var moveCounter = 0;
 
@@ -125,7 +128,10 @@ function checkGameOver(row, column) {
 		document.getElementById("row"+row+"Win").style.display = "block";
 		document.getElementById("gameCaption").style.color = "#FFFFFF";
 		document.getElementById("gameCaption").style.fontSize = "x-large";		
-		document.getElementById("gameCaption").innerHTML = rows[row].type + " wins!";		
+		document.getElementById("gameCaption").innerHTML = rows[row].type + " wins!";
+		if (rows[row].type == "X") { xWins++; }
+		else { yWins++; }
+		updateStatsTable();
 //		window.alert(rows[row].type + " wins!");
 	} else if (columns[column].count == 3) {
 		var left = "";
@@ -141,25 +147,38 @@ function checkGameOver(row, column) {
 		document.getElementById("gameCaption").style.color = "#FFFFFF";
 		document.getElementById("gameCaption").style.fontSize = "x-large";			
 		document.getElementById("gameCaption").innerHTML = columns[column].type + " wins!";
+		if (columns[column].type == "X") { xWins++; }
+		else { yWins++; }
+		updateStatsTable();		
 //		window.alert(columns[column].type + " wins!");
 	} else if (downDiagonal.count == 3) {
 		document.getElementById('downDiagonalWin').style.display = "block";
 		document.getElementById("gameCaption").style.color = "#FFFFFF";
 		document.getElementById("gameCaption").style.fontSize = "x-large";	
 		document.getElementById("gameCaption").innerHTML = downDiagonal.type + " wins!";
+		if (downDiagonal.type == "X") { xWins++; }
+		else { yWins++; }
+		updateStatsTable();		
 //		window.alert(downDiagonal.type + " wins!");
 	} else if (upDiagonal.count == 3) {
 		document.getElementById('upDiagonalWin').style.display = "block";
 		document.getElementById("gameCaption").style.color = "#FFFFFF";
 		document.getElementById("gameCaption").style.fontSize = "x-large";
 		document.getElementById("gameCaption").innerHTML = upDiagonal.type + " wins!";
+		if (upDiagonal.type == "X") { xWins++; }
+		else { yWins++; }
+		updateStatsTable();		
 //		window.alert(upDiagonal.type + " wins!");
 	} else if (moveCounter == 9) {
 		document.getElementById("gameCaption").style.color = "#FFFFFF";
 		document.getElementById("gameCaption").style.fontSize = "x-large";
 		document.getElementById("gameCaption").innerHTML = "It's a tie!";
+		ties++;
+		updateStatsTable();
+		
 //		window.alert("It's a tie!");
 	}
+
 }
 
 function openModal() {
@@ -170,6 +189,12 @@ function openModal() {
 function closeModal() {
   document.getElementById('ticTacToeModal').style.display = "none";
   reset();
+	xStats.wins = 0;
+	xStats.losses = 0;
+	xStats.ties = 0;
+	yStats.wins = 0;
+	yStats.losses = 0;;
+	yStats.ties = 0;
 }
 
 function reset() {
@@ -196,3 +221,14 @@ function reset() {
 	document.getElementById("gameCaption").style.fontSize = "medium";
 	document.getElementById("startButton").innerHTML = "Play again!";
 }
+
+function updateStatsTable() {
+//	if (document.getElementById("statsTable").style.display == "none") {
+		document.getElementById("statsTable").style.display = "block";
+		document.getElementById("playAgainButton").style.display = "block";
+//	}
+	document.getElementById('xWinsCell').innerHTML = xWins;
+	document.getElementById('yWinsCell').innerHTML = yWins;
+	document.getElementById('tiesCell').innerHTML = ties;	
+}
+

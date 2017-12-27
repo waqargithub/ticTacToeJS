@@ -12,7 +12,7 @@
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
-    padding-top: 50px; /* Location of the box */
+    padding-top: 10px; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
@@ -26,8 +26,8 @@
 .modal-content {
     margin: auto;
     display: block;
-    height: 60%;
-    max-width: 700px;
+    height: 100%;
+/*    max-width: 700px; */
 }
 
 /* Caption of Modal Image (Image Text) - Same Width as the Image */
@@ -63,8 +63,8 @@
 /* The Close Button */
 .close {
     position: absolute;
-    top: 15px;
-    right: 35px;
+    top: 0;
+    right: 10%;
     color: #f1f1f1;
     font-size: 40px;
     font-weight: bold;
@@ -76,13 +76,6 @@
     color: #bbb;
     text-decoration: none;
     cursor: pointer;
-}
-
-/* 100% Image Width on Smaller Screens */
-@media only screen and (max-width: 700px){
-    .modal-content {
-        width: 100%;
-    }
 }
 
 .modalSpan {
