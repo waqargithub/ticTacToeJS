@@ -123,6 +123,7 @@ function squareClick(element, row, column) {
 
 function checkGameOver(row, column) {
 	if (rows[row].count == 3) {
+		document.getElementById("row"+row+"Win").style.display = "block";
 		window.alert(rows[row].type + " wins!");
 	} else if (columns[column].count == 3) {
 		window.alert(columns[column].type + " wins!");
