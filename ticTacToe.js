@@ -14,6 +14,9 @@ var columns = [
 			{type: "", count: 0}
 		   ];
 
+var downDiagonal = {type: "", count: 0};
+var upDiagonal = {type: "", count: 0};
+
 function squareClick(element, row, column) { 	
 	if (element.innerHTML == "") {
 		if (currentLetter == true) {
@@ -38,6 +41,30 @@ function squareClick(element, row, column) {
 			else if (columns[column].type == "O") {
 				columns[column].type = "T";
 			}
+			if ( ((row==0) && (column==0)) || ((row==1) && (column==1)) || ((row==2) && (column==2))  ) {
+				if (downDiagonal.type == "") {
+					downDiagonal.type = "X";
+					downDiagonal.count = 1;
+				}
+				else if (downDiagonal.type == "X") {
+					downDiagonal.count = downDiagonal.count+1;
+				}
+				else if (downDiagonal.type == "O") {
+					downDiagonal.type = "T";
+				}
+			}
+			if ( ((row==2) && (column==0)) || ((row==1) && (column==1)) || ((row==0) && (column==2))  ) {
+				if (upDiagonal.type == "") {
+					upDiagonal.type = "X";
+					upDiagonal.count = 1;
+				}
+				else if (upDiagonal.type == "X") {
+					upDiagonal.count = upDiagonal.count+1;
+				}
+				else if (upDiagonal.type == "O") {
+					upDiagonal.type = "T";
+				}
+			}			
 			currentLetter = false;
 		}
 		else {
@@ -61,7 +88,31 @@ function squareClick(element, row, column) {
 			}
 			else if (columns[column].type == "X") {
 				columns[column].type = "T";
-			}			
+			}
+			if ( ((row==0) && (column==0)) || ((row==1) && (column==1)) || ((row==2) && (column==2))  ) {
+				if (downDiagonal.type == "") {
+					downDiagonal.type = "O";
+					downDiagonal.count = 1;
+				}
+				else if (downDiagonal.type == "O") {
+					downDiagonal.count = downDiagonal.count+1;
+				}
+				else if (downDiagonal.type == "X") {
+					downDiagonal.type = "T";
+				}
+			}
+			if ( ((row==2) && (column==0)) || ((row==1) && (column==1)) || ((row==0) && (column==2))  ) {
+				if (upDiagonal.type == "") {
+					upDiagonal.type = "O";
+					upDiagonal.count = 1;
+				}
+				else if (upDiagonal.type == "O") {
+					upDiagonal.count = upDiagonal.count+1;
+				}
+				else if (upDiagonal.type == "X") {
+					upDiagonal.type = "T";
+				}
+			}				
 			currentLetter = true;
 //			document.getElementById('firstRowWin').style.display = "block";
 		}
@@ -75,6 +126,10 @@ function checkGameOver(row, column) {
 		window.alert(rows[row].type + " wins!");
 	} else if (columns[column].count == 3) {
 		window.alert(columns[column].type + " wins!");
+	} else if (downDiagonal.count == 3) {
+		window.alert(downDiagonal.type + " wins!");
+	} else if (upDiagonal.count == 3) {
+		window.alert(upDiagonal.type + " wins!");
 	} else if (moveCounter == 9) {
 		window.alert("It's a tie!");
 //		document.getElementById('row0Horizontal').style.display = inline;
