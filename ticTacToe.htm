@@ -18,27 +18,29 @@
 	
 </head>
 <body>
-	<div class="grid">
+	<div id="grid">
 		<div id="row0" class="row">
 			<div class="horizontalWin" id="firstRowWin"></div>
-			<div id="square00" class="square"><span class="text" onclick="squareClick(this);"></span></div>
+   <div class="verticalWin" id="firstColumnWin"></div>
+			<div id="square00" class="square" onclick="squareClick(this);"></div>
 			<div class="verticalLine"></div>		
 			<div id="square01" class="square" onclick="squareClick(this);"></div>
 			<div class="verticalLine"></div>		
 			<div id="square02" class="square" onclick="squareClick(this);"></div>
-			<div class="clear"></div>
 			<div class="horizontalLine"></div>
 		</div>
-		<div id="row1">
-			<div id="square10" class="square" onclick="squareClick(this);"></div>
+		<div id="row1" class="row">
+			<div class="horizontalWin" id="secondRowWin"></div>
+   <div id="square10" class="square" onclick="squareClick(this);"></div>
 			<div class="verticalLine"></div>
 			<div id="square11" class="square" onclick="squareClick(this);"></div>
 			<div class="verticalLine"></div>		
 			<div id="square12" class="square" onclick="squareClick(this);"></div>		
 			<div class="horizontalLine"></div>
 		</div>
-		<div id="row2">
-			<div id="square20" class="square" onclick="squareClick(this);"></div>
+		<div id="row2" class="row">
+			<div class="horizontalWin" id="thirdRowWin"></div>
+   <div id="square20" class="square" onclick="squareClick(this);"></div>
 			<div class="verticalLine"></div>		
 			<div id="square21" class="square" onclick="squareClick(this);"></div>
 			<div class="verticalLine"></div>		
