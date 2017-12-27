@@ -1,6 +1,5 @@
 var currentLetter = true;
 var moveCounter = 0;
-var win = false;
 
 var rows = [
 			{type: "", count: 0},
@@ -124,7 +123,10 @@ function squareClick(element, row, column) {
 function checkGameOver(row, column) {
 	if (rows[row].count == 3) {
 		document.getElementById("row"+row+"Win").style.display = "block";
-		window.alert(rows[row].type + " wins!");
+		document.getElementById("gameCaption").style.color = "#FFFFFF";
+		document.getElementById("gameCaption").style.fontSize = "x-large";		
+		document.getElementById("gameCaption").innerHTML = rows[row].type + " wins!";		
+//		window.alert(rows[row].type + " wins!");
 	} else if (columns[column].count == 3) {
 		var left = "";
 		if (column == 0) {
@@ -135,17 +137,62 @@ function checkGameOver(row, column) {
 			left = "82%";
 		}
 		document.getElementById("columnWin").style.left = left;	
-		document.getElementById("columnWin").style.display = "block";		
-		window.alert(columns[column].type + " wins!");
+		document.getElementById("columnWin").style.display = "block";
+		document.getElementById("gameCaption").style.color = "#FFFFFF";
+		document.getElementById("gameCaption").style.fontSize = "x-large";			
+		document.getElementById("gameCaption").innerHTML = columns[column].type + " wins!";
+//		window.alert(columns[column].type + " wins!");
 	} else if (downDiagonal.count == 3) {
 		document.getElementById('downDiagonalWin').style.display = "block";
-		window.alert(downDiagonal.type + " wins!");
+		document.getElementById("gameCaption").style.color = "#FFFFFF";
+		document.getElementById("gameCaption").style.fontSize = "x-large";	
+		document.getElementById("gameCaption").innerHTML = downDiagonal.type + " wins!";
+//		window.alert(downDiagonal.type + " wins!");
 	} else if (upDiagonal.count == 3) {
 		document.getElementById('upDiagonalWin').style.display = "block";
-		window.alert(upDiagonal.type + " wins!");
+		document.getElementById("gameCaption").style.color = "#FFFFFF";
+		document.getElementById("gameCaption").style.fontSize = "x-large";
+		document.getElementById("gameCaption").innerHTML = upDiagonal.type + " wins!";
+//		window.alert(upDiagonal.type + " wins!");
 	} else if (moveCounter == 9) {
-		window.alert("It's a tie!");
+		document.getElementById("gameCaption").style.color = "#FFFFFF";
+		document.getElementById("gameCaption").style.fontSize = "x-large";
+		document.getElementById("gameCaption").innerHTML = "It's a tie!";
+//		window.alert("It's a tie!");
 	}
 }
 
+function openModal() {
+  document.getElementById('ticTacToeModal').style.display = "block";
+  document.getElementById('gameCaption').innerHTML = "Game on!";
+}
 
+function closeModal() {
+  document.getElementById('ticTacToeModal').style.display = "none";
+  reset();
+}
+
+function reset() {
+	currentLetter = true;
+	moveCounter = 0;
+	for (i=0; i<3; i++) {
+		rows[i].type = "";
+		rows[i].count = 0;	
+		columns[i].type = "";
+		columns[i].count = 0;		
+		document.getElementById("row"+i+"Win").style.display = "none";
+		for (j=0; j<3; j++) {
+			document.getElementById("square"+i+j).innerHTML = "";
+		}
+	}
+	document.getElementById("columnWin").style.display = "none";	
+	document.getElementById("upDiagonalWin").style.display = "none";
+	document.getElementById("downDiagonalWin").style.display = "none";
+	downDiagonal.type = "";
+	downDiagonal.count = 0;
+	upDiagonal.type = "";
+	upDiagonal.count = 0;
+	document.getElementById("gameCaption").style.color = "#006";
+	document.getElementById("gameCaption").style.fontSize = "medium";
+	document.getElementById("startButton").innerHTML = "Play again!";
+}
