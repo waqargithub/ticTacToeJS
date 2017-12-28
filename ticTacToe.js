@@ -1,5 +1,5 @@
 var xWins = 0;
-var yWins = 0;
+var oWins = 0;
 var ties = 0;
 var currentLetter = true;
 var moveCounter = 0;
@@ -124,16 +124,13 @@ function squareClick(element, row, column) {
 }
 
 function checkGameOver(row, column) {
+	var winner = "";
 	if (rows[row].count == 3) {
+		winner = rows[row].type;
 		document.getElementById("row"+row+"Win").style.display = "block";
-		document.getElementById("gameCaption").style.color = "#FFFFFF";
-		document.getElementById("gameCaption").style.fontSize = "x-large";		
-		document.getElementById("gameCaption").innerHTML = rows[row].type + " wins!";
-		if (rows[row].type == "X") { xWins++; }
-		else { yWins++; }
-		updateStatsTable();
-//		window.alert(rows[row].type + " wins!");
-	} else if (columns[column].count == 3) {
+	}
+	else if (columns[column].count == 3) {
+		winner = columns[column].type;
 		var left = "";
 		if (column == 0) {
 			left = "14.5%";
@@ -143,40 +140,35 @@ function checkGameOver(row, column) {
 			left = "82%";
 		}
 		document.getElementById("columnWin").style.left = left;	
-		document.getElementById("columnWin").style.display = "block";
-		document.getElementById("gameCaption").style.color = "#FFFFFF";
-		document.getElementById("gameCaption").style.fontSize = "x-large";			
-		document.getElementById("gameCaption").innerHTML = columns[column].type + " wins!";
-		if (columns[column].type == "X") { xWins++; }
-		else { yWins++; }
-		updateStatsTable();		
-//		window.alert(columns[column].type + " wins!");
-	} else if (downDiagonal.count == 3) {
+		document.getElementById("columnWin").style.display = "block";	
+	}
+	else if (downDiagonal.count == 3) {
+		winner = downDiagonal.type;
 		document.getElementById('downDiagonalWin').style.display = "block";
-		document.getElementById("gameCaption").style.color = "#FFFFFF";
-		document.getElementById("gameCaption").style.fontSize = "x-large";	
-		document.getElementById("gameCaption").innerHTML = downDiagonal.type + " wins!";
-		if (downDiagonal.type == "X") { xWins++; }
-		else { yWins++; }
-		updateStatsTable();		
-//		window.alert(downDiagonal.type + " wins!");
-	} else if (upDiagonal.count == 3) {
+	}
+	else if (upDiagonal.count == 3) {
+		winner = upDiagonal.type;
 		document.getElementById('upDiagonalWin').style.display = "block";
+	}
+	else if (moveCounter == 9) {
+		winner = "T";
+	}
+	if (winner != "") {
 		document.getElementById("gameCaption").style.color = "#FFFFFF";
 		document.getElementById("gameCaption").style.fontSize = "x-large";
-		document.getElementById("gameCaption").innerHTML = upDiagonal.type + " wins!";
-		if (upDiagonal.type == "X") { xWins++; }
-		else { yWins++; }
+		if (winner == "X") {
+			xWins++;
+  		document.getElementById("gameCaption").innerHTML = "X wins!";
+		}
+		else if (winner == "O") {
+			oWins++;
+  		document.getElementById("gameCaption").innerHTML = "O wins!";
+		}
+		else {
+			ties++;
+			document.getElementById("gameCaption").innerHTML = "It's a tie!";
+		}
 		updateStatsTable();		
-//		window.alert(upDiagonal.type + " wins!");
-	} else if (moveCounter == 9) {
-		document.getElementById("gameCaption").style.color = "#FFFFFF";
-		document.getElementById("gameCaption").style.fontSize = "x-large";
-		document.getElementById("gameCaption").innerHTML = "It's a tie!";
-		ties++;
-		updateStatsTable();
-		
-//		window.alert("It's a tie!");
 	}
 
 }
@@ -189,12 +181,14 @@ function openModal() {
 function closeModal() {
   document.getElementById('ticTacToeModal').style.display = "none";
   reset();
-	xStats.wins = 0;
-	xStats.losses = 0;
-	xStats.ties = 0;
-	yStats.wins = 0;
-	yStats.losses = 0;;
-	yStats.ties = 0;
+	document.getElementById('xWinsCell').innerHTML = "";
+	document.getElementById('oWinsCell').innerHTML = "";
+	document.getElementById('tiesCell').innerHTML = "";
+	xWins = 0;
+	oWins = 0;
+	ties = 0;
+	document.getElementById("statsTable").style.display = "none";
+	document.getElementById("playAgainButton").style.display = "none";
 }
 
 function reset() {
@@ -217,18 +211,19 @@ function reset() {
 	downDiagonal.count = 0;
 	upDiagonal.type = "";
 	upDiagonal.count = 0;
+	
 	document.getElementById("gameCaption").style.color = "#006";
 	document.getElementById("gameCaption").style.fontSize = "medium";
-	document.getElementById("startButton").innerHTML = "Play again!";
+	document.getElementById("gameCaption").innerHTML = "Game on!";
+	document.getElementById("statsTable").style.display = "none";
+	document.getElementById("playAgainButton").style.display = "none";
 }
 
 function updateStatsTable() {
-//	if (document.getElementById("statsTable").style.display == "none") {
-		document.getElementById("statsTable").style.display = "block";
-		document.getElementById("playAgainButton").style.display = "block";
-//	}
+	document.getElementById("statsTable").style.display = "block";
+	document.getElementById("playAgainButton").style.display = "block";
 	document.getElementById('xWinsCell').innerHTML = xWins;
-	document.getElementById('yWinsCell').innerHTML = yWins;
+	document.getElementById('oWinsCell').innerHTML = oWins;
 	document.getElementById('tiesCell').innerHTML = ties;	
 }
 
