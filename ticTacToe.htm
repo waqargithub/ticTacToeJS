@@ -18,69 +18,92 @@
 	
 </head>
 <body>
- <div id="heading"><h1>Tis Time to Tic Tac Toe!</h1></div>
- <button class="playButton" onclick="openModal();">Play!</button>
- <div id="ticTacToeModal" class="modal">
-  <div class="modal-content">
-   
-   
-   <span class="close cursor" onclick="closeModal();">&times;</span>
+ <div id="container">
+  <div id="heading"><h1>Tis Time to Tic Tac Toe!</h1></div>
+  
+  <h2>Player Mode</h2>
+<label class="radioContainer">
+  <p><input type="radio" checked="checked" name="playerMode">
+  Two players on this machine</p>
+  <span class="checkmark"></span>
+</label>
+<label class="radioContainerFuture" disabled>
+  <p><input type="radio" name="playerMode" disabled>
+  One player against computer</p>
+  <span class="checkmark"></span>
+</label>
+<label class="radioContainerFuture" disabled>
+  <p><input type="radio" name="playerMode" disabled>
+  Two players on different machines</p>
+  <span class="checkmark"></span>
+</label>
 
-   <div id="grid">
-    <div id="row0" class="row">
-     <div class="horizontalWin" id="row0Win"></div>
-     <div class="verticalWin" id="columnWin"></div>
-     <div id="downDiagonalWin"></div>
-     <div id="upDiagonalWin"></div>    
-     <div id="square00" class="square" onclick="squareClick(this, 0, 0);"></div>
-     <div class="verticalLine"></div>  
-     <div id="square01" class="square" onclick="squareClick(this, 0, 1);"></div>
-     <div class="verticalLine"></div>   
-     <div id="square02" class="square" onclick="squareClick(this, 0, 2);"></div>
-     <div class="horizontalLine"></div>
-    </div>
-    <div id="row1" class="row">
-     <div class="horizontalWin" id="row1Win"></div>
-     <div id="square10" class="square" onclick="squareClick(this, 1, 0);"></div>
-     <div class="verticalLine"></div>
-     <div id="square11" class="square" onclick="squareClick(this, 1, 1);"></div>
-     <div class="verticalLine"></div>		
-     <div id="square12" class="square" onclick="squareClick(this, 1, 2);"></div>		
-     <div class="horizontalLine"></div>
-    </div>
-    <div id="row2" class="row">
-     <div class="horizontalWin" id="row2Win"></div>
-     <div id="square20" class="square" onclick="squareClick(this, 2, 0);"></div>
-     <div class="verticalLine"></div>		
-     <div id="square21" class="square" onclick="squareClick(this, 2, 1);"></div>
-     <div class="verticalLine"></div>		
-     <div id="square22" class="square" onclick="squareClick(this, 2, 2);"></div>
-     <div class="clear"></div>
-    </div>
-    <br>
-    <div class="caption" id="gameCaption"></div>
-    <div id="stats">
+  
+  
+  
+  
+  <button class="playButton" onclick="openModal();">Play!</button>
+  <div id="ticTacToeModal" class="modal">
+   <div class="modal-content">
+    
+    
+    <span class="close cursor" onclick="closeModal();">&times;</span>
+ 
+    <div id="grid">
+     <div id="row0" class="row">
+      <div class="horizontalWin" id="row0Win"></div>
+      <div class="verticalWin" id="columnWin"></div>
+      <div id="downDiagonalWin"></div>
+      <div id="upDiagonalWin"></div>    
+      <div id="square00" class="square" onclick="squareClick(this, 0, 0);"></div>
+      <div class="verticalLine"></div>  
+      <div id="square01" class="square" onclick="squareClick(this, 0, 1);"></div>
+      <div class="verticalLine"></div>   
+      <div id="square02" class="square" onclick="squareClick(this, 0, 2);"></div>
+      <div class="horizontalLine"></div>
+     </div>
+     <div id="row1" class="row">
+      <div class="horizontalWin" id="row1Win"></div>
+      <div id="square10" class="square" onclick="squareClick(this, 1, 0);"></div>
+      <div class="verticalLine"></div>
+      <div id="square11" class="square" onclick="squareClick(this, 1, 1);"></div>
+      <div class="verticalLine"></div>		
+      <div id="square12" class="square" onclick="squareClick(this, 1, 2);"></div>		
+      <div class="horizontalLine"></div>
+     </div>
+     <div id="row2" class="row">
+      <div class="horizontalWin" id="row2Win"></div>
+      <div id="square20" class="square" onclick="squareClick(this, 2, 0);"></div>
+      <div class="verticalLine"></div>		
+      <div id="square21" class="square" onclick="squareClick(this, 2, 1);"></div>
+      <div class="verticalLine"></div>		
+      <div id="square22" class="square" onclick="squareClick(this, 2, 2);"></div>
+      <div class="clear"></div>
+     </div>
      <br>
-     <table class="table" id="statsTable">
-      <tr>
-       <td>X Wins</td>
-       <td>O Wins</td>
-       <td>Ties</td>
-      </tr>
-      <tr>
-       <td id="xWinsCell"></td>
-       <td id="oWinsCell"></td>
-       <td id="tiesCell"></td>
-      </tr>
-     </table>
-     <br>
+     <div class="caption" id="gameCaption"></div>
+     <div id="stats">
+      <br>
+      <table class="table" id="statsTable">
+       <tr>
+        <td>X Wins</td>
+        <td>O Wins</td>
+        <td>Ties</td>
+       </tr>
+       <tr>
+        <td id="xWinsCell"></td>
+        <td id="oWinsCell"></td>
+        <td id="tiesCell"></td>
+       </tr>
+      </table>
+      <br>
+     </div>
+     <div><button class="playButton" id="playAgainButton" onclick="reset();">Play Again</button></div>
     </div>
-    <div><button class="playButton" id="playAgainButton" onclick="reset();">Play Again</button></div>
+ 
+ 
+    
    </div>
-
-
-   
   </div>
  </div>
-	
 </body>
