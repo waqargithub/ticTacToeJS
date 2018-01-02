@@ -15,8 +15,22 @@ html {
 	padding: 20px;
 	display: inline-block;
 	position: absolute;
-	left: 45%;
+	left: 20%;
+/*  margin-left: auto;
+  margin-right: auto; */
 	top: 15%;
+}
+
+@media only screen and (min-width: 450px) and (max-width: 700px) {
+  
+  #grid {left: 35%;}
+  
+}
+
+@media only screen and (min-width: 701px) {
+  
+  #grid {left: 45%;}
+  
 }
 
 .row {
