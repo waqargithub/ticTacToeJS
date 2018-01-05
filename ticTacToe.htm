@@ -23,17 +23,17 @@
   
   <h2>Player Mode</h2>
 <label class="radioContainer">
-  <p><input type="radio" checked="checked" name="playerMode">
+  <p><input type="radio" checked="checked" name="playerMode" id="2playersHere">
   Two players on this machine</p>
   <span class="checkmark"></span>
 </label>
-<label class="radioContainerFuture" disabled>
-  <p><input type="radio" name="playerMode" disabled>
-  One player against computer (coming soon)</p>
+<label class="radioContainer">
+  <p><input type="radio" name="playerMode" id="playComputer">
+  One player against computer</p>
   <span class="checkmark"></span>
 </label>
 <label class="radioContainerFuture" disabled>
-  <p><input type="radio" name="playerMode" disabled>
+  <p><input type="radio" name="playerMode" id="2playersSeparate" disabled>
   Two players on different machines (coming soon)</p>
   <span class="checkmark"></span>
 </label>
@@ -42,7 +42,7 @@
   
   
   
-  <button class="playButton" onclick="openModal();">Play!</button>
+  <button class="playButton" onclick="playerMode = getPlayerMode(); openModal();">Play!</button>
   <div id="ticTacToeModal" class="modal">
    <div class="modal-content">
     
@@ -98,7 +98,11 @@
       </table>
       <br>
      </div>
-     <div><button class="playButton" id="playAgainButton" onclick="reset();">Play Again</button></div>
+     <div><button class="playButton" id="playAgainButton"
+             onclick='reset(); if (playerMode == "playComputer") {setUpPlayComputer();}'>
+             Play Again
+          </button>
+     </div>
     </div>
  
  
