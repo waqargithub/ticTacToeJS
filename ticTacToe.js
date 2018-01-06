@@ -3,6 +3,7 @@
 	var xWins = 0;
 	var oWins = 0;
 	var ties = 0;
+	var gameOver = false;
 	var currentLetter = "";
 	var computersLetter = "";	
 	var moveCounter = 0;
@@ -47,6 +48,7 @@ function setUpPlayComputer() {
 		computersLetter = "X";
 		document.getElementById("square00").innerHTML = computersLetter;
 		moveHistory[0] = 0;
+		grid[0] = "X";
 		moveCounter++;
 		rows[0].count = 1;
 		rows[0].type = computersLetter;
@@ -59,7 +61,7 @@ function setUpPlayComputer() {
 function squareClick(element, row, column) {
 	var squareNumber = 3*row + column;
 //	var squareKey = "square" + squareNumber;
-	if (element.innerHTML == "") {
+	if ( (element.innerHTML == "") && (gameOver == false) ) {
 			element.innerHTML = currentLetter;
 			grid[squareNumber] = currentLetter;
 			moveHistory[moveCounter] = squareNumber;
@@ -123,10 +125,12 @@ function checkGameOver(row, column) {
 	var winner = "";
 	if (rows[row].count == 3) {
 		winner = rows[row].type;
+		gameOver = true;
 		document.getElementById("row"+row+"Win").style.display = "block";
 	}
 	else if (columns[column].count == 3) {
 		winner = columns[column].type;
+		gameOver = true;
 		var left = "";
 		if (column == 0) {
 			left = "14.5%";
@@ -140,14 +144,17 @@ function checkGameOver(row, column) {
 	}
 	else if (downDiagonal.count == 3) {
 		winner = downDiagonal.type;
+		gameOver = true;
 		document.getElementById('downDiagonalWin').style.display = "block";
 	}
 	else if (upDiagonal.count == 3) {
 		winner = upDiagonal.type;
+		gameOver = true;
 		document.getElementById('upDiagonalWin').style.display = "block";
 	}
 	else if (moveCounter == 9) {
 		winner = "T";
+		gameOver = true;
 	}
 	if (winner != "") {
 		document.getElementById("gameCaption").style.color = "#FFFFFF";
@@ -199,6 +206,7 @@ function reset() {
 
 	currentLetter = "X";
 	moveCounter = 0;
+	gameOver = false;
 	for (i=0; i<3; i++) {
 		rows[i].type = "";
 		rows[i].count = 0;	
@@ -310,19 +318,19 @@ function makeMove() {
 				currentElement = document.getElementById("square02");
 				squareClick(currentElement, 0, 2);				
 			}
-			else if (moveHistory[3] == 1) {
+			else if (moveHistory[3] == 1) { //2nd O in square01
 				currentElement = document.getElementById("square21");
 				squareClick(currentElement, 2, 1);				
 			}
-			else if (moveHistory[3] == 5) {
+			else if (moveHistory[3] == 5) { //2nd O in square12
 				currentElement = document.getElementById("square10");
 				squareClick(currentElement, 1, 0);				
 			}			
-			else if (moveHistory[3] == 7) {
+			else if (moveHistory[3] == 7) { //2nd O in square21
 				currentElement = document.getElementById("square01");
 				squareClick(currentElement, 0, 1);				
 			}			
-			else if (moveHistory[3] == 3) {
+			else if (moveHistory[3] == 3) { //2nd O in square10
 				currentElement = document.getElementById("square12");
 				squareClick(currentElement, 1, 2);				
 			}			
@@ -330,110 +338,51 @@ function makeMove() {
 		
 	}
 	
-	else if (moveCounter == 6) { //It's time for X's 4th move
-		if ( (downDiagonal.type == "X") && (downDiagonal.count == 2) ) {
-			//If downDiagonal is one X away from a win
-			if (grid[4] == "") { //if square4 is empty
-			//put 4th X in square4 for win
-				currentElement = document.getElementById("square11");
-				squareClick(currentElement, 1, 1);				
-			}
-			else //this scenario means square 8 is empty
-				currentElement = document.getElementById("square22");
-				squareClick(currentElement, 2, 2);				
-		}
-		else if ( (rows[0].type =="X") && (rows[0].count == 2) ) {
-			//if top row is one X away from a win
-			//then put X in square 1 (X already exists in square 0 and 2 when row0 is near a win)
-			currentElement = document.getElementById("square01");
-			squareClick(currentElement, 0, 1);				
-		}
-		else if ( (columns[0].type == "X") && (columns[0].count == 2 ) ) {
-			//if first column is 1 X away from a win
-			//This scenario would happen if 1st O was in square 4
-				currentElement = document.getElementById("square10");
-				squareClick(currentElement, 1, 0);					
-		}
-		else if ( ( rows[2].type == "X") && (rows[2].count == 2) ) {
-			//if bottom row is 1 X away from a win
-			//then put X in square 7 (X already exists in square6 and 8 when row2 is near a win)
-			currentElement = document.getElementById("square21");
-			squareClick(currentElement, 2, 1);				
-		}
-		else if ( (columns[2].type == "X") && (columns[2].count == 2) ) {
-			//if last column is 1 X away from a win
-			//then put X in square 5 (X already exists in square2 and 8 when col2 is near a win)
-			currentElement = document.getElementById("square12");
-			squareClick(currentElement, 1, 2);				
-		}
-		else if ( (upDiagonal.type == "X") && (upDiagonal.count == 2) ) {
-			//if upDiagonal is 1 X away from a win
-			
-			if (grid[2] == "") { //if square2 is empty
-			//then put X in square 2
-				currentElement = document.getElementById("square02");
-				squareClick(currentElement, 0, 2);
-			}
-			else { //put X in square 4
-				currentElement = document.getElementById("square11");
-				squareClick(currentElement, 1, 1);				
-			}
-		}
-		else if (moveHistory[1] == 4) { //if 1st O was put in square4
-			//then now likely going for draw unless O makes a mistake
-			checkForImpendingWin();
-		}		
-	}
-	else if (moveCounter == 8) {
-		checkForImpendingWin();		
+	else if ( (moveCounter == 6) || (moveCounter == 8) ) { //It's time for X's 4th or 5th move
+		checkForImpendingWin();
 	}
 }
 
 function checkForImpendingWin() {
-
-	if ( (downDiagonal.type != "T") && (downDiagonal.count == 2) ) {
+//First check if it's possible to complete a win
+	if ( (downDiagonal.type == computersLetter) && (downDiagonal.count == 2) ) {
 		doWinOrBlock("downDiagonal", 0);		
-		/*if (downDiagonal.type == computersLetter) {
-			completeWin("downDiagonal", 0);
-		}
-		else {
-			blockWin("downDiagonal", 0);
-		}*/
 	}
-	else if ( (upDiagonal.type != "T") && (upDiagonal.count == 2) ) {
+	else if ( (upDiagonal.type == computersLetter) && (upDiagonal.count == 2) ) {
 		doWinOrBlock("upDiagonal", 6);		
-	/*	if (upDiagonal.type == computersLetter) {
-			completeWin("upDiagonal", 6);
-		}
-		else {
-			blockWin("upDiagonal", 6);
-		}*/
 	}
 	else {
 		for (i=0; i<3; i++) {
-				if ( (rows[i].type != "T") && (rows[i].count == 2) ) {
+				if ( (rows[i].type == computersLetter) && (rows[i].count == 2) ) {
 					doWinOrBlock("row", i);
-/*					if (rows[i].type == computersLetter) {
-						completeWin("row", i);
-					}
-					else {
-						blockWin("row", i);
-					}*/
-
 					break;
 				}
-				if ( (columns[i].type != "T") && (columns[i].count == 2) ) {
+				if ( (columns[i].type == computersLetter) && (columns[i].count == 2) ) {
 					doWinOrBlock("column", i);
-				/*	if (columns[i].type == computersLetter) {
-						completeWin("column", i);
-					}
-					else {
-						blockWin("column", i);
-					}*/
 					break;
 				}
 		}		
 	}
+	
+	//If no win possible then check if there is a need to block a win
+	if ( (downDiagonal.type == "O") && (downDiagonal.count == 2) ) {
+		doWinOrBlock("downDiagonal", 0);		
+	}
+	else if ( (upDiagonal.type == "O") && (upDiagonal.count == 2) ) {
+		doWinOrBlock("upDiagonal", 6);		
+	}
+	else {
+		for (i=0; i<3; i++) {
+				if ( (rows[i].type == "O") && (rows[i].count == 2) ) {
+					doWinOrBlock("row", i);
+					break;
+				}
+				if ( (columns[i].type == "O") && (columns[i].count == 2) ) {
+					doWinOrBlock("column", i);
+					break;
+				}
+		}		
+	}	
 }
 
 function doWinOrBlock(dimension, index) {
