@@ -21,6 +21,10 @@
  <div id="container">
   <div id="heading"><h1>Tis Time to Tic Tac Toe!</h1></div>
   
+  <!--User selects one of three player modes: (1) two players using one client window on same machine,
+    (2) one player playing computer on client machine, and (3) two players playing each other, each using
+    a different client machine. -->
+  
   <h2>Player Mode</h2>
 <label class="radioContainer">
   <p><input type="radio" checked="checked" name="playerMode" id="2playersHere">
@@ -32,7 +36,7 @@
   One player against computer</p>
   <span class="checkmark"></span>
 </label>
-<label class="radioContainerFuture" disabled>
+<label class="radioContainerFuture" disabled> <!--For future use -->
   <p><input type="radio" name="playerMode" id="2playersSeparate" disabled>
   Two players on different machines (coming soon)</p>
   <span class="checkmark"></span>
@@ -40,35 +44,58 @@
 
   
   
-  
-  
+  <!--When player clicks Play button, get player mode and open modal that displays tic tac toe grid -->  
   <button class="playButton" onclick="playerMode = getPlayerMode(); openModal();">Play!</button>
   <br><hr>
   <div>
+   <!--Button to go back one window. This is useful when the game is reached via a link from another
+     page (e.g. list of programming projects) -->
    <button class="button" id="backButton" onclick="window.history.back();">
      Go Back
    </button>
   </div>
   
+  <!--Div that holds the modal used to display tic tac toe grid. Takes up entire window-->
   <div id="ticTacToeModal" class="modal">
+   
+   <!--Div that holds content for modal. May not take up entire window.-->
    <div class="modal-content">
     
-    
+    <!--Display the X you click to close the modal-->    
     <span class="close cursor" onclick="closeModal();">&times;</span>
  
+    <!--Div that holds tic tac toe grid
+    Grid is row0, row1, row2 with a horizontal line on each side of row1 -->
     <div id="grid">
+     
+     <!--Div that holds first row -->
      <div id="row0" class="row">
+      
+      <!--row0Win is a horizontal line that is superimposed (z-index=1) on row0 but
+        not displayed unless a win occurs across row0. -->
       <div class="horizontalWin" id="row0Win"></div>
+      
+      <!--columnWin is a vertical line initially not displayed, made visible if a win occurs.
+        Superimposed (z-index=1) across the winning column upon win across a column.
+        Same line is used across all columns by setting CSS margin-left. -->
       <div class="verticalWin" id="columnWin"></div>
+      
+      <!--equivalent of row0Win for diagonal from square00 to square22-->
       <div id="downDiagonalWin"></div>
-      <div id="upDiagonalWin"></div>    
+      <!--equivalent of row0Win for diagonal from square02 to square20-->
+      <div id="upDiagonalWin"></div>
+      <!--each row has square, vertical line, square, vertical line, square -->
       <div id="square00" class="square" onclick="squareClick(this, 0, 0);"></div>
       <div class="verticalLine"></div>  
       <div id="square01" class="square" onclick="squareClick(this, 0, 1);"></div>
       <div class="verticalLine"></div>   
       <div id="square02" class="square" onclick="squareClick(this, 0, 2);"></div>
+      <!--And then a horizontal line separates the rows-->
       <div class="horizontalLine"></div>
      </div>
+     
+     <!--same as row0 except column and diagonal wins are placed only in row0.
+        row1 has row1win to be displayed when a win across row1-->
      <div id="row1" class="row">
       <div class="horizontalWin" id="row1Win"></div>
       <div id="square10" class="square" onclick="squareClick(this, 1, 0);"></div>
@@ -78,6 +105,11 @@
       <div id="square12" class="square" onclick="squareClick(this, 1, 2);"></div>		
       <div class="horizontalLine"></div>
      </div>
+     
+     
+     <!--same as row0 except column and diagonal wins are placed only in row0.
+        row2 has row2win to be displayed when a win across row2
+        There is no horizontal line underneath row2 -->     
      <div id="row2" class="row">
       <div class="horizontalWin" id="row2Win"></div>
       <div id="square20" class="square" onclick="squareClick(this, 2, 0);"></div>
@@ -88,7 +120,11 @@
       <div class="clear"></div>
      </div>
      <br>
+     
+     <!--Caption is used to display messages, status about the game -->
      <div class="caption" id="gameCaption"></div>
+     
+     <!--div that holds a table that shows the number of ties, and wins by X, O -->
      <div id="stats">
       <br>
       <table class="table" id="statsTable">
@@ -105,6 +141,8 @@
       </table>
       <br>
      </div>
+     
+     <!--button to play again. Resets grid to prepare for new game -->
      <div><button class="playButton" id="playAgainButton"
              onclick='reset(); if (playerMode == "playComputer") {setUpPlayComputer();}'>
              Play Again

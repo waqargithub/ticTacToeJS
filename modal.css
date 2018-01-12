@@ -13,7 +13,7 @@
     background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
 }
 
-/* Modal Content (Image) */
+/* Modal Content (tic tac toe grid) */
 .modal-content {
 /*    margin: auto;*/
     margin-left: auto;
@@ -23,7 +23,7 @@
 /*    max-width: 700px; */
 }
 
-/* Caption of Modal Image (Image Text) - Same Width as the Image */
+/* Caption of Modal */
 #caption {
     margin: auto;
     display: block;
