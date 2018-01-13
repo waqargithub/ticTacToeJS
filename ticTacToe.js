@@ -81,15 +81,10 @@ function getPlayerMode() {
 	}
 	
 	//if one player playing against computer, return the mode, set up variables to
-	//play computer, get difficulty level from switch
+	//play computer, get difficulty level from range
 	else if (document.getElementById("playComputer").checked == true) {
 		setUpToPlayComputer();
-		if (document.getElementById("difficultyLevelSwitch").checked == true) {
-			difficultyLevel = "expert";			
-		}
-		else {
-			difficultyLevel = "novice";
-		}
+		difficultyLevel = document.getElementById("difficultyLevelRange").value;
 		return "playComputer";
 	}
 	
@@ -113,7 +108,7 @@ function updateCaption(newCaption) {
 // ---------  Begin Function dispalyDifficultyLevelSwitch  -----
 
 //Displays the difficulty selection switch if playComputer mode is selected
-function displayDifficultyLevelSwitch() {
+function displayDifficultyLevelRange() {
 	document.getElementById('difficultyLevelDiv').style.display = "block";
 }
 
@@ -195,7 +190,7 @@ function updateGameStatus(element, row, column) {
 		var newCaption = currentLetter+"'s move.";
 		updateCaption(newCaption);
 
-		//Check if the last move resulted in a win		
+		//Check if the last move resulted in a win, which can only happen when moveCounter>4		
 		if (moveCounter > 4) {
 			checkGameOver(row, column);
 		}
@@ -484,15 +479,15 @@ function updateStatsTable() {
 
 function makeMove() {
 	
-	//makeExpertMove() and makeNoviceMove() affect moves
-	//computer makes. Call the required function  based on
+	//makeExpertMove() and makeNonExpertMove() affect moves
+	//computer makes. Call the required function based on
 	//difficulty level specified by player
-	if (difficultyLevel == "expert") {
+	if (difficultyLevel == 2) {
 		makeExpertMove();
 	}
 	else {
-		makeNoviceMove();
-	}
+		makeNonExpertMove();
+	} 
 }
 
 // ---------  End Function makeMove  ----
@@ -877,9 +872,9 @@ function doWinOrBlock(dimension, dimensionIndex) {
 
 // ---------  End Function doWinOrBlock  ----
 
-// ---------  Begin Function makeNoviceMove  ----
+// ---------  Begin Function makeNonExpertMove  ----
 
-function makeNoviceMove() {
+function makeNonExpertMove() {
 	
 	var squareToModify; //the number of the square to modify
 	var squaresRow; //the row of this square
@@ -906,22 +901,26 @@ function makeNoviceMove() {
 		//If it is past computer's first move
 		//First check if there is an impending win. This check automatically plays
 		//to complete the computers win or block the players win
-	} else if (!checkForImpendingWin()) {
+	} else if ( (moveCounter < 4) || (!checkForImpendingWin()) ) {
 		
-		//if it is not an impending win then find the square to modify.
-		squareToModify = findNextSquare();
-		
-		//Calculate row and column of this square, get div of displayed grid to modify
-		squaresRow = Math.floor(squareToModify/3);
-		squaresColumn = squareToModify%3;
-		elementToModify = document.getElementById("square"+squaresRow+squaresColumn);
-		
-		//Make call to square click to put computersLetter on that square in displayed grid
-		updateGameStatus(elementToModify, squaresRow, squaresColumn);
+			//There is no win possible when moveCounter < 4 so don't spend time checking
+			//for impending win. So if moveCounter < 4 OR it is not an impending win
+			//then find the square to modify.
+			
+			squareToModify = findNextSquare();
+			
+			//Calculate row and column of this square, get div of displayed grid to modify
+			squaresRow = Math.floor(squareToModify/3);
+			squaresColumn = squareToModify%3;
+			elementToModify = document.getElementById("square"+squaresRow+squaresColumn);
+			
+			//Make call to square click to put computersLetter on that square in displayed grid
+			updateGameStatus(elementToModify, squaresRow, squaresColumn);
 	}
 }
 
-// ---------  End Function makeNoviceMove  ----
+// ---------  End Function makeNonExpertMove  ----
+
 
 
 // ---------  Begin Function findNextSquare  ----
@@ -931,66 +930,73 @@ function findNextSquare() {
 	//Go through the squares of the grid
 	for (i=0; i<9; i++) {
 		
-		//If you come across a square that has computersLetter in it then see if an empty square
-		//is adjacent to it.
-		if (grid[i] == computersLetter) {
+		//If difficulty level is 1 (moderate difficulty)
+		if (difficultyLevel == 1) {
 			
-			//check horizontally
-			//If not in last column, check if one square to the right is empty. If so, return this square
-			if ( (i%3 < 2) && (grid[i+1]=="") ) {
-			return (i+1);
-			}
-
-			//If not in first column, check if one square to the left is empty. If so, return this square
-			else if ( (i%3 > 0) && (grid[i-1] == "") ) {
-				return (i-1);
-			}
-			
-			//check vertically
-			//If not in last row, check if one square below is empty. If so, return this square			
-			else if ( (Math.floor(i/3) < 2) && (grid[i+3] == "") ) {
-				return (i+3);
-			}
-			
-			//If not in first column, check if one square above is empty. If so, return this square			
-			else if ( (Math.floor(i/3) > 0) && (grid[i-3] == "") ) {
-				return (i-3);
-			}
-			
-			//check if on downDiagonal
-			else if (onDownDiagonal(i)) {
+			//Look for a square that has computersLetter in it then try to find an empty square
+			//that is adjacent to it.
+			if (grid[i] == computersLetter) {
 				
-				//if not square 8, check if one square down diagonal is empty. If so, return it.
-				if ( (i<8) && (grid[i+4] == "") ) {
-					return(i+4);
+				//check horizontally
+				//If not in last column, check if one square to the right is empty. If so, return this square
+				if ( (i%3 < 2) && (grid[i+1]=="") ) {
+				return (i+1);
+				}
+	
+				//If not in first column, check if one square to the left is empty. If so, return this square
+				else if ( (i%3 > 0) && (grid[i-1] == "") ) {
+					return (i-1);
 				}
 				
-				//if not square 0, check if one square up the diagonal is empty. If so, return it.
-				else if ( (i>0) && (grid[i-4] == "") ) {
-					return(i-4);
+				//check vertically
+				//If not in last row, check if one square below is empty. If so, return this square			
+				else if ( (Math.floor(i/3) < 2) && (grid[i+3] == "") ) {
+					return (i+3);
 				}
+				
+				//If not in first column, check if one square above is empty. If so, return this square			
+				else if ( (Math.floor(i/3) > 0) && (grid[i-3] == "") ) {
+					return (i-3);
+				}
+				
+				//check if on downDiagonal
+				else if (onDownDiagonal(i)) {
+					
+					//if not square 8, check if one square down diagonal is empty. If so, return it.
+					if ( (i<8) && (grid[i+4] == "") ) {
+						return(i+4);
+					}
+					
+					//if not square 0, check if one square up the diagonal is empty. If so, return it.
+					else if ( (i>0) && (grid[i-4] == "") ) {
+						return(i-4);
+					}
+				}
+				
+				//check up diagonal
+				else if (onUpDiagonal(i)) {
+					
+					//if not in the bottom row, check if one square up diagonal is empty. If so, return it.
+					if ( (i<6) && (grid[i+2] == "") ) {
+						return(i+2);
+					}
+					
+					//if not in the top row, check if one square down diagonal is empty. If so, return it.
+					else if ( (i>2) && (grid[i-2] == "") ) {
+						return(i-2);
+					}
+				}			
 			}
 			
-			//check up diagonal
-			else if (onUpDiagonal(i)) {
-				
-				//if not in the bottom row, check if one square up diagonal is empty. If so, return it.
-				if ( (i<6) && (grid[i+2] == "") ) {
-					return(i+2);
-				}
-				
-				//if not in the top row, check if one square down diagonal is empty. If so, return it.
-				else if ( (i>2) && (grid[i-2] == "") ) {
-					return(i-2);
-				}
+			//If nothing matches above and move counter is 8 then it means only one square empty.
+			//If current square empty, return that square.
+			else if ( (moveCounter == 8) && (grid[i] =="") ) {
+				return i;
 			}			
 		}
-		
-		//If nothing matches above and move counter is 8 then it means only one square empty.
-		//If current square empty, return that square.
-		else if ( (moveCounter == 8) && (grid[i] =="") ) {
-			return i;
-		}
+		//if difficulty level is 0 (novice difficulty) then return the first blank square found
+		else if (grid[i] == "")
+				return i;
 	}
 }
 
@@ -1033,7 +1039,7 @@ function closeModal() {
 	//Reset radio button selections
 	document.getElementById('2playersHere').checked = true;
 	document.getElementById('playComputer').checked = false;
-	document.getElementById('difficultyLevelSwitch').checked = true;
+	document.getElementById('difficultyLevelRange').value = 1;
 	document.getElementById('difficultyLevelDiv').style.display = "none";
 }
 

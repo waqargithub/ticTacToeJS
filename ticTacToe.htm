@@ -33,20 +33,18 @@
 </label>
 <div id="playComputerDiv">
  <label class="radioContainer">
-   <p><input type="radio" name="playerMode" id="playComputer" onchange="displayDifficultyLevelSwitch();">
+   <p><input type="radio" name="playerMode" id="playComputer" onchange="displayDifficultyLevelRange();">
    One player against computer</p>
    <span class="checkmark"></span>
  </label>
- <div id="difficultyLevelDiv">
+ <div id="difficultyLevelDiv" class="smallerFont">
    <div id="textDifficultyLevel" class="floatLeft">Difficulty Level: &nbsp;</div>
-   <div id="textNovice" class="floatLeft">Novice &nbsp;</div>
-   <div id="switchDiv" class="floatLeft">
-    <label class="switch">
-     <input type="checkbox" id="difficultyLevelSwitch" checked>
-     <span class="slider round"></span>
-    </label>
+   <div id="textNovice" class="floatLeft">Novice</div>
+   <div id="rangeDiv" class="floatLeft">
+     <input type="range" id="difficultyLevelRange" class="slider"
+            max="2" min="0" step="1" defaultValue="1">
    </div>
-   <div id="textExpert" class="floatLeft">&nbsp; Expert</div>
+   <div id="textExpert" class="floatLeft">Expert</div>
    <div class="floatClear"></div>
  </div>
 </div>
