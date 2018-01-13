@@ -208,11 +208,6 @@ table {
     cursor: pointer;
 }
 
-#difficultyLevelDiv {
-  margin-left: 2.5em;
-  display: none;
-}
-
 .floatLeft {
   float: left;
 }
@@ -223,4 +218,28 @@ table {
 
 .smallerFont {
   font-size: 0.9em;
+}
+
+#difficultyLevelDiv {
+   width: 85%;
+   
+}
+
+#difficultyLevelDiv {
+  margin-left: 2.5em;
+  display: none;
+  width: 85%;
+}
+
+#textDifficultyLevel {
+   padding-bottom: 0.5em;
+}
+  
+
+@media only screen and (min-width: 400px) {
+
+  #textDifficultyLevel {
+    padding-bottom: 0;
+  }
+  
 }
