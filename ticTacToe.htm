@@ -31,11 +31,25 @@
   Two players on this machine</p>
   <span class="checkmark"></span>
 </label>
-<label class="radioContainer">
-  <p><input type="radio" name="playerMode" id="playComputer">
-  One player against computer</p>
-  <span class="checkmark"></span>
-</label>
+<div id="playComputerDiv">
+ <label class="radioContainer">
+   <p><input type="radio" name="playerMode" id="playComputer" onchange="displayDifficultyLevelSwitch();">
+   One player against computer</p>
+   <span class="checkmark"></span>
+ </label>
+ <div id="difficultyLevelDiv">
+   <div id="textDifficultyLevel" class="floatLeft">Difficulty Level: &nbsp;</div>
+   <div id="textNovice" class="floatLeft">Novice &nbsp;</div>
+   <div id="switchDiv" class="floatLeft">
+    <label class="switch">
+     <input type="checkbox" id="difficultyLevelSwitch" checked>
+     <span class="slider round"></span>
+    </label>
+   </div>
+   <div id="textExpert" class="floatLeft">&nbsp; Expert</div>
+   <div class="floatClear"></div>
+ </div>
+</div>
 <label class="radioContainerFuture" disabled> <!--For future use -->
   <p><input type="radio" name="playerMode" id="2playersSeparate" disabled>
   Two players on different machines (coming soon)</p>
@@ -85,11 +99,11 @@
       <!--equivalent of row0Win for diagonal from square02 to square20-->
       <div id="upDiagonalWin"></div>
       <!--each row has square, vertical line, square, vertical line, square -->
-      <div id="square00" class="square" onclick="squareClick(this, 0, 0);"></div>
+      <div id="square00" class="square" onclick="updateGameStatus(this, 0, 0);"></div>
       <div class="verticalLine"></div>  
-      <div id="square01" class="square" onclick="squareClick(this, 0, 1);"></div>
+      <div id="square01" class="square" onclick="updateGameStatus(this, 0, 1);"></div>
       <div class="verticalLine"></div>   
-      <div id="square02" class="square" onclick="squareClick(this, 0, 2);"></div>
+      <div id="square02" class="square" onclick="updateGameStatus(this, 0, 2);"></div>
       <!--And then a horizontal line separates the rows-->
       <div class="horizontalLine"></div>
      </div>
@@ -98,11 +112,11 @@
         row1 has row1win to be displayed when a win across row1-->
      <div id="row1" class="row">
       <div class="horizontalWin" id="row1Win"></div>
-      <div id="square10" class="square" onclick="squareClick(this, 1, 0);"></div>
+      <div id="square10" class="square" onclick="updateGameStatus(this, 1, 0);"></div>
       <div class="verticalLine"></div>
-      <div id="square11" class="square" onclick="squareClick(this, 1, 1);"></div>
+      <div id="square11" class="square" onclick="updateGameStatus(this, 1, 1);"></div>
       <div class="verticalLine"></div>		
-      <div id="square12" class="square" onclick="squareClick(this, 1, 2);"></div>		
+      <div id="square12" class="square" onclick="updateGameStatus(this, 1, 2);"></div>		
       <div class="horizontalLine"></div>
      </div>
      
@@ -112,11 +126,11 @@
         There is no horizontal line underneath row2 -->     
      <div id="row2" class="row">
       <div class="horizontalWin" id="row2Win"></div>
-      <div id="square20" class="square" onclick="squareClick(this, 2, 0);"></div>
+      <div id="square20" class="square" onclick="updateGameStatus(this, 2, 0);"></div>
       <div class="verticalLine"></div>		
-      <div id="square21" class="square" onclick="squareClick(this, 2, 1);"></div>
+      <div id="square21" class="square" onclick="updateGameStatus(this, 2, 1);"></div>
       <div class="verticalLine"></div>		
-      <div id="square22" class="square" onclick="squareClick(this, 2, 2);"></div>
+      <div id="square22" class="square" onclick="updateGameStatus(this, 2, 2);"></div>
       <div class="clear"></div>
      </div>
      <br>
@@ -144,7 +158,7 @@
      
      <!--button to play again. Resets grid to prepare for new game -->
      <div><button class="playButton" id="playAgainButton"
-             onclick='reset(); if (playerMode == "playComputer") {setUpPlayComputer();}'>
+             onclick='reset(); if (playerMode == "playComputer") {setUpToPlayComputer();}'>
              Play Again
           </button>
      </div>
