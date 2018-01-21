@@ -27,8 +27,8 @@
   
   <h2>Player Mode</h2>
 <label class="radioContainer">
-  <p><input type="radio" checked="checked" name="playerMode" id="2playersHere">
-  Two players on this machine</p>
+  <p><input type="radio" checked="checked" name="playerMode" id="2playersHere" onclick="setUp2PlayersHere();">
+  Two players on this device</p>
   <span class="checkmark"></span>
 </label>
 <div id="playComputerDiv">
@@ -50,7 +50,7 @@
    <div class="floatClear"></div>
  </div>
 </div>
-<label class="radioContainerFuture" disabled> <!--For future use -->
+<label class="radioContainerFuture" disabled id="2playersSeparateDiv"> <!--For future use -->
   <p><input type="radio" name="playerMode" id="2playersSeparate" disabled>
   Two players on different machines (coming soon)</p>
   <span class="checkmark"></span>
@@ -59,7 +59,7 @@
   
   
   <!--When player clicks Play button, get player mode and open modal that displays tic tac toe grid -->  
-  <button class="playButton" onclick="playerMode = getPlayerMode(); openModal();">Play!</button>
+  <p><button class="playButton" onclick="playerMode = getPlayerMode(); openModal();">Play!</button></p>
   <br><hr>
   <div>
    <!--Button to go back one window. This is useful when the game is reached via a link from another
