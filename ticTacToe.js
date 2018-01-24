@@ -122,7 +122,7 @@ function displayDifficultyLevelRange() {
 	//Displaying difficulty level selector causes Play Button to move further
 	//down. Remove future, grayedout option from display so that user does not
 	//have to scroll down to click on Play button on mobile devices/smaller screens
-	if (document.body.clientHeight < 500) {
+	if (window.innerHeight < 500) {
 		document.getElementById('2playersSeparateDiv').style.display = "none";
 	}
 }
