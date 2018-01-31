@@ -7,11 +7,15 @@
 
 	var currentLetter = ""; //Letter to be placed on grid in the next move
 	var computersLetter = "";		//Letter assigned to computer in play computer mode
+	var computerGoesFirst = false; //used to track turns for who goes first
 	
 	var gameOver = false; //Used to prevent any moves after game is over
 
-	var moveCounter = 0; //Number of moves used to determine tie
-	var moveHistory = new Array(9); //Move number keeps track of square used. Letter not tracked.
+	//Keep count of number of moves. Used to determine tie, or for computer move calculation
+	var moveCounter = 0;
+	
+	var moveHistory = new Array(9); //Keeps track of square used for each move. Letter not tracked.
+	
 	
 	//An array to Keep track of letter in each square of grid. Grid squares are numbered as follows:
 	/*
@@ -21,12 +25,11 @@
 	 */
 	var grid = new Array(9).fill("");		
 	
-	//An array of three objects. Each object describes the current status of corresponding row.
 	
+	//An array of three objects. Each object describes the current status of corresponding row.
 	//When a letter is placed in empty row, that row is given type of that letter and its count set to 1
 	//to track that only one of that letter is in that row. When a second of the same type of letter
 	//placed in a row, type stays unchanged and count increments to 2, and, on third time, to 3.
-	
 	//When a letter is placed in a row that already has the opposite letter--type of row is
 	//different than current letter--then row given a type = T for tie.
 	var rows = [
@@ -42,10 +45,10 @@
 				{type: "", count: 0}
 				 ];
 
-	//Keep track of type and count for downDiagonal--diagonal from square00 to 22	
+	//Keep track of type and count for downDiagonal--diagonal from square0 to 22	
 	var downDiagonal = {type: "", count: 0};
 
-	//Keep track of type and count for upDiagonal--diagonal from square20 to 02	
+	//Keep track of type and count for upDiagonal--diagonal from square6 to 02	
 	var upDiagonal = {type: "", count: 0};
 	
 	//Stores player mode. Used to determine when playing against computer and when
@@ -83,8 +86,14 @@ function getPlayerMode() {
 	//if one player playing against computer, return the mode, set up variables to
 	//play computer, get difficulty level from range
 	else if (document.getElementById("playComputer").checked == true) {
-		setUpToPlayComputer();
 		difficultyLevel = document.getElementById("difficultyLevelRange").value;
+		
+		//Let player go first except in expert mode
+		if (difficultyLevel < 2)
+			computerGoesFirst = false;
+		else
+			computerGoesFirst = true;			
+		setUpToPlayComputer();
 		return "playComputer";
 	}
 	
@@ -120,7 +129,7 @@ function displayDifficultyLevelRange() {
 	document.getElementById('difficultyLevelDiv').style.display = "block";
 	
 	//Displaying difficulty level selector causes Play Button to move further
-	//down. Remove future, grayedout option from display so that user does not
+	//down. Remove future, grayed-out option from display so that user does not
 	//have to scroll down to click on Play button on mobile devices/smaller screens
 	if (window.innerHeight < 500) {
 		document.getElementById('2playersSeparateDiv').style.display = "none";
@@ -135,33 +144,37 @@ function displayDifficultyLevelRange() {
 //Function to set up grid and variables for a game against computer
 function setUpToPlayComputer() {
 	
-		computersLetter = "X"; //Computer takes X. Makes first move.
+		computersLetter = "X"; //Computer takes X.
+		
+		//If computer goes first then make first move and update all variables.
+		if (computerGoesFirst) {
+			//To make first move, set square0 to computer's letter, which is X
+			document.getElementById("square0").innerHTML = computersLetter;
+			
+			//Record that the first move occupied square0
+			moveHistory[0] = 0;
+			
+			//Record that square0 has X
+			grid[0] = "X";
+			
+			//increment count of moves
+			moveCounter++;
+			
+			//Since first move in square0, set row 0 count to 1, type to X
+			rows[0].count = 1;
+			rows[0].type = computersLetter;
+			
+			//Since first move in square0, set column 0 count to 1, type to X
+			columns[0].count = 1;
+			columns[0].type = computersLetter;
+			
+			//Since first move in square0, set downDiagonal count to 1, type to X		
+			downDiagonal.count = 1;
+			downDiagonal.type = computersLetter;			
+		}
 
-		//To make first move, set square00 to computer's letter, which is X
-		document.getElementById("square00").innerHTML = computersLetter;
 		
-		//Record that the first move occupied square0
-		moveHistory[0] = 0;
-		
-		//Record that square0 has X
-		grid[0] = "X";
-		
-		//increment count of moves
-		moveCounter++;
-		
-		//Since first move in square00, set row 0 count to 1, type to X
-		rows[0].count = 1;
-		rows[0].type = computersLetter;
-		
-		//Since first move in square00, set column 0 count to 1, type to X
-		columns[0].count = 1;
-		columns[0].type = computersLetter;
-		
-		//Since first move in square00, set downDiagonal count to 1, type to X		
-		downDiagonal.count = 1;
-		downDiagonal.type = computersLetter;
-		
-		//Now players's move. Set current letter--the move about to occur--to O.
+		//Set up for players's move. Set current letter--the move about to occur--to O.
 		currentLetter = "O"; 
 
 		//update whose move it is
@@ -193,24 +206,29 @@ function openModal() {
 
 //Function called when player clicks a square, or when computer makes move
 //to put a letter on grid. Arguments: element is square/div to which letter will be written.
-//row and column identify row and column of square to be modified.
-function updateGameStatus(element, row, column) {
+//SquareNumber is index of square to be modified.
+//First row has squares  0 1 2
+//Second row has squares 3 4 5
+//Third row has squares  6 7 8
+
+function updateGameStatus(element, squareNumber) {
 	
-	//Proceed only if element/square is empty and game not over
-	if ( (element.innerHTML == "") && (gameOver == false) ) {
+	//Proceed only if element holding square is empty and game not over
+	if ( (grid[squareNumber] == "") && (gameOver == false) ) {
 		
 		writeCurrentLetterToGrid(element);	
-		updateGameVariables(row, column);
-			
+		updateGameVariables(squareNumber);
+		
+		//update displayed message for whose move it is	
 		var newCaption = currentLetter+"'s move.";
 		updateCaption(newCaption);
 
 		//Check if the last move resulted in a win, which can only happen when moveCounter>4		
 		if (moveCounter > 4) {
-			checkGameOver(row, column);
+			checkGameOver(squareNumber);
 		}
-		//If playerMode is to play computer, and its now computers move
-		if ( (playerMode == "playComputer") && (currentLetter == computersLetter) ) {
+		//If game not over, playerMode is to play computer, and its now computers move
+		if ( (!gameOver) && (playerMode == "playComputer") && (currentLetter == computersLetter) ) {
 
 			//Call function that calculates and completes computers next move
 			makeMove();
@@ -234,52 +252,52 @@ function writeCurrentLetterToGrid(element) {
 // ---------  Begin Function updateGameVariables----
 
 //update variables required to track, process game
-function updateGameVariables(row, column) {
+function updateGameVariables(squareNumber) {
 	
-	//Calculate square number using row and column
-	var squareNumber = 3*row + column;
-	
-		
 	//Record in grid that current letter put in the square number being modified
 	grid[squareNumber] = currentLetter;
+	
+	//Calculate row and columns for this square
+	var squaresRow = Math.floor(squareNumber/3);
+	var squaresColumn = squareNumber%3;	
 			
-	//Record in move history which square was modified
+	//Record in move history which square was modified. Index of first move is zero.
 	moveHistory[moveCounter] = squareNumber;
 			
 	//If it's a blank row then set row type to current letter, set count to 1
-	if (rows[row].type == "") {
-		rows[row].type = currentLetter;
-		rows[row].count = 1;
+	if (rows[squaresRow].type == "") {
+		rows[squaresRow].type = currentLetter;
+		rows[squaresRow].count = 1;
 	}
 			
 	//If row not blank but of same type as currentLetter, leave its type unchanged
 	//Increment its count.
-	else if (rows[row].type == currentLetter) {
-		rows[row].count = rows[row].count+1;
+	else if (rows[squaresRow].type == currentLetter) {
+		rows[squaresRow].count = rows[squaresRow].count+1;
 	}
 			
 	//If not an empty row and row type different than current letter
-	//Set type to T to indicate this row cannot result in a win, is tied
-	else if (rows[row].type != "") {
-		rows[row].type = "T";
+	//Set type to T (if not already T) to indicate this row cannot result in a win, is tied
+	else if (rows[squaresRow].type != "T")  {
+		rows[squaresRow].type = "T";
 	}
 			
 	//If it's a blank column then set column type to current letter, set count to 1
-	if (columns[column].type == "") {
-		columns[column].type = currentLetter;
-		columns[column].count = 1;
+	if (columns[squaresColumn].type == "") {
+		columns[squaresColumn].type = currentLetter;
+		columns[squaresColumn].count = 1;
 	}
 
 	//If column not blank but of same type as currentLetter, leave its type unchanged
 	//Increment its count.
-	else if (columns[column].type == currentLetter) {
-		columns[column].count = columns[column].count+1;
+	else if (columns[squaresColumn].type == currentLetter) {
+		columns[squaresColumn].count = columns[squaresColumn].count+1;
 	}
 
 	//If not an empty column and column type different than current letter
-	//Set type to T to indicate this column cannot result in a win, is tied
-	else if (columns[column].type != "") {
-		columns[column].type = "T";
+	//Set type to T (if not already T) to indicate this column cannot result in a win, is tied
+	else if (columns[squaresColumn].type != "T") {
+		columns[squaresColumn].type = "T";
 	}
 			
 	//if it is a square that is part of downDiagonal
@@ -298,8 +316,8 @@ function updateGameVariables(row, column) {
 		}
 
 		//If downDiagonal not empty and its type different than current letter
-		//Set type to T to indicate downDiagonal cannot result in a win, is tied
-		else if (downDiagonal.type != "") {
+		//Set type to T (if not already T) to indicate downDiagonal cannot result in a win, is tied
+		else if (downDiagonal.type != "T") {
 			downDiagonal.type = "T";
 		}
 	}
@@ -320,16 +338,21 @@ function updateGameVariables(row, column) {
 		}
 
 		//If upDiagonal not empty and its type different than current letter
-		//Set type to T to indicate upDiagonal cannot result in a win, is tied
-		else if (upDiagonal.type != "") {
+		//Set type to T (if not already T) to indicate upDiagonal cannot result in a win, is tied
+		else if (upDiagonal.type != "T") {
 			upDiagonal.type = "T";
 		}
 	}
 
-	//increment count of number of moves	
+	//increment count of number of moves. After first move, moveCounter is 1.	
 	moveCounter++;
-			
-	//Variables updated
+	
+	//check if 9 moves have been made. In that case, grid full and game over.
+	if (moveCounter == 9) {
+		gameOver = true;
+	}
+	//All variables are now updated.
+	
 	//Toggle letter to prepare for next move
 	if (currentLetter == "X")
 		currentLetter = "O";
@@ -374,34 +397,40 @@ function onUpDiagonal(i) {
 // ---------  Begin Function checkGameOver  ----
 
 //Function to check rows, columns, and diagonals to see if a win has occurred
-function checkGameOver(row, column) {
+//squareNumber is square on which last move was made.
+function checkGameOver(squareNumber) {
 	
 	var winner = "";
+	
+	//Calculate row and columns for this square
+	var squaresRow = Math.floor(squareNumber/3);
+	var squaresColumn = squareNumber%3;		
 
 	//Cycle through rows and see if a count of any row has reached 3.
-	if (rows[row].count == 3) {
+	//Count increments to 3 only if all letters are of the same type.
+	if (rows[squaresRow].count == 3) {
 
 		//If so then win has happened. Winner is type of that row. Record that game is over.
-		winner = rows[row].type;
+		winner = rows[squaresRow].type;
 		gameOver = true;
 
 		//Display superimposed line on top of letters to cross them and show a win has occurred
-		document.getElementById("row"+row+"Win").style.display = "block";
+		document.getElementById("row"+squaresRow+"Win").style.display = "block";
 	}
 	
 	//If no win across rows, cycle through columns and see if a count of any column has reached 3.	
-	else if (columns[column].count == 3) {
+	else if (columns[squaresColumn].count == 3) {
 		
 		//If so, win has happened. Winner is type of that column. Record that game is over.
-		winner = columns[column].type;
+		winner = columns[squaresColumn].type;
 		gameOver = true;
 		
 		//Display superimposed vertical line that crosses letter in winning column.
 		//First, calculate what CSS margin-left should be to align with winning column
 		var left = "";
-		if (column == 0) {
+		if (squaresColumn == 0) {
 			left = "14.5%";
-		} else if (column == 1) {
+		} else if (squaresColumn == 1) {
 			left = "47.5%";
 		} else {
 			left = "82%";
@@ -434,7 +463,7 @@ function checkGameOver(row, column) {
 		document.getElementById('upDiagonalWin').style.display = "block";
 	}
 	
-	//if no win has occurred across rows, counters, diagonals then check of 9 moves have occurred
+	//if no win has occurred across rows, counters, diagonals then check if 9 moves have occurred
 	else if (moveCounter == 9) {
 
 		//if so, then set winner to T to indicate it's a tie. Record that game is over.
@@ -514,131 +543,226 @@ function makeMove() {
 //Difficulty level set to expert
 function makeExpertMove() {
 
-	//For computer's 2nd, and 3rd move, use program author's strategy to seek win or tie
-	//based on where player puts the O's in their moves
+	var squareToModify; //the number of the square to modify
+	var elementToModify; //the div of displayed grid that holds this square
+	var impendingWinInfo = {dimension: "", dimensionIndex: -1, type: ""};
 
-
-	//computer goes first. If move counter is 2 then it's computer's second move.
-	if (moveCounter == 2) {
-
-		//moveHistory[1] tells where O made their first move. If O's first move is in
-		//squares 1, 2, 5, 7, or 8
-		if ( 	(moveHistory[1] == 1) || (moveHistory[1] == 2) || (moveHistory[1] == 5) ||
-					(moveHistory[1] == 7) || (moveHistory[1] == 8)
-			 )
-			 { //put 2nd X in square6
-			currentElement = document.getElementById("square20");
-			updateGameStatus(currentElement, 2, 0);
+	if (computerGoesFirst) {
+		//computers first move is in square0 as done in setUpToPlayComputer()
+		//For computer's 2nd, and 3rd move, use program author's strategy to seek win or tie
+		//based on where player puts the O's in their moves
+	
+	
+		//In this condition, computer goes first. If move counter is 2 then it's computer's second move.
+		if (moveCounter == 2) {
+	
+			//moveHistory[1] tells where O made their first move. If O's first move is in
+			//squares 1, 2, 5, 7, or 8
+			if ( 	(moveHistory[1] == 1) || (moveHistory[1] == 2) || (moveHistory[1] == 5) ||
+						(moveHistory[1] == 7) || (moveHistory[1] == 8)
+				 )
+				 { //put 2nd X in square6
+				currentElement = document.getElementById("square6");
+				updateGameStatus(currentElement, 6);
+			}
+			
+			//If O's 1st move is square 3 or 6
+			else if ( 	(moveHistory[1] == 3) || (moveHistory[1] == 6) ) { 
+				//put 2nd X in square 2
+				currentElement = document.getElementById("square2");
+				updateGameStatus(currentElement, 2);
+			}
+	
+			//If O's first move is square4
+			else if (moveHistory[1] == 4) { 
+				//Put second X in square8
+				currentElement = document.getElementById("square8");
+				updateGameStatus(currentElement, 8);
+			}		
+			
 		}
 		
-		//If O's 1st move is square 3 or 6
-		if ( 	(moveHistory[1] == 3) || (moveHistory[1] == 6) ) { 
-			//put 2nd X in square 2
-			currentElement = document.getElementById("square02");
-			updateGameStatus(currentElement, 0, 2);
+		// If it's time for computer's 3rd move
+		else if (moveCounter == 4) { 
+			
+			//If computer's second move used square6
+			if (moveHistory[2] == 6) { 
+				
+				//if O's 2nd move did not block by using square3
+				if (moveHistory[3] != 3) { 
+					//then put 3rd X in square3 for win
+					currentElement = document.getElementById("square3");
+					updateGameStatus(currentElement, 3);				
+				}
+				
+				//If O used square 1 or 2 for its 1st move
+				//( <=2 means 1 or 2 since computer has already taken square 0)
+				else if (moveHistory[1] <= 2) { 
+					//then put 3rd X in square8
+					currentElement = document.getElementById("square8");
+					updateGameStatus(currentElement, 8);
+				}
+				
+				//if O used square7 or 8 for its 1st move
+				else if (moveHistory[1] > 6) { 
+					//Put 3rd X in square2
+					currentElement = document.getElementById("square2");
+					updateGameStatus(currentElement, 2);					
+				}
+				else if (moveHistory[1] == 5) { //if O used square5 for its 1st move
+					//Put 3rd X in square4
+					currentElement = document.getElementById("square4");
+					updateGameStatus(currentElement, 4);					
+				}
+			}
+			
+			//if second X was placed in square2
+			else if (moveHistory[2] == 2) {
+				
+				//if 2nd O did not use square1 to block
+				if (moveHistory[3] != 1) { 
+					//Put 3rd X in square1 for win
+					currentElement = document.getElementById("square1");
+					updateGameStatus(currentElement, 1);					
+				}
+				
+				//this scenario occurs when O's first move was square3 or 6
+				else { 
+					//Put X in square8
+					currentElement = document.getElementById("square8");
+					updateGameStatus(currentElement, 8);					
+				}
+			}
+			
+			//if 1st O in square4 (means 2nd X would have been put in square8 per code above)
+			else if (moveHistory[1] == 4) {
+				
+				//if 2nd O in square2
+				if (moveHistory[3] == 2) {
+					//Put 3rd X in square 6
+					currentElement = document.getElementById("square6");
+					updateGameStatus(currentElement, 6);						
+				}
+				
+				//if 2nd O in square6
+				else if (moveHistory[3] == 6) { 
+					//Put X in square2
+					currentElement = document.getElementById("square2");
+					updateGameStatus(currentElement, 2);				
+				}
+				else if (moveHistory[3] == 1) { //2nd O in square1
+					//put X in square7
+					currentElement = document.getElementById("square7");
+					updateGameStatus(currentElement, 7);				
+				}
+				else if (moveHistory[3] == 5) { //2nd O in square5
+					//Put X in square3
+					currentElement = document.getElementById("square3");
+					updateGameStatus(currentElement, 3);				
+				}			
+				else if (moveHistory[3] == 7) { //2nd O in square7
+					//Put X in square1
+					currentElement = document.getElementById("square1");
+					updateGameStatus(currentElement, 1);				
+				}			
+				else if (moveHistory[3] == 3) { //2nd O in square3
+					//Put X in square3
+					currentElement = document.getElementById("square5");
+					updateGameStatus(currentElement, 5);				
+				}			
+			}		
+			
 		}
-
-		//If O's first move is square4
-		if (moveHistory[1] == 4) { 
-			//Put second X in square8
-			currentElement = document.getElementById("square22");
-			updateGameStatus(currentElement, 2, 2);
-		}		
 		
+		//If it's time for computer's 4th or 5th move
+		else if ( (moveCounter == 6) || (moveCounter == 8) ) {
+			
+			//Call function that checks for impending win and then seek a win or block
+			impendingWinInfo = checkForImpendingWin();
+			if (impendingWinInfo.dimension != "") {
+				doWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
+			}
+			else {
+				squareToModify = findNextSquare();
+				elementToModify = document.getElementById("square"+squareToModify);
+				updateGameStatus(elementToModify, squareToModify);
+			}
+		}
 	}
 	
-	// If it's time for X's 3rd move
-	else if (moveCounter == 4) { 
+	//else player has gone first.
+	else {
 		
-		//If X's second move used square6
-		if (moveHistory[2] == 6) { 
+		//If player has made only one move so far
+		if (moveCounter == 1) {
 			
-			//if O's 2nd move did not block by using square3
-			if (moveHistory[3] != 3) { 
-				//then put 3rd X in square3 for win
-				currentElement = document.getElementById("square10");
-				updateGameStatus(currentElement, 1, 0);				
+			//if square4 is empty then make first move there.
+			if (grid[4] == "") {
+				currentElement = document.getElementById("square4");
+				updateGameStatus(currentElement, 4);					
 			}
-			
-			//If O used square 1 or 2 for its 1st move (X would then use square0)
-			else if (moveHistory[1] <= 2) { 
-				//then put 3rd X in square8
-				currentElement = document.getElementById("square22");
-				updateGameStatus(currentElement, 2, 2);
-			}
-			
-			//if O used square7 or 8 for its 1st move
-			else if (moveHistory[1] > 6) { 
-				//Put 3rd X in square2
-				currentElement = document.getElementById("square02");
-				updateGameStatus(currentElement, 0, 2);					
-			}
-			else if (moveHistory[1] == 5) { //if O used square5 for its 1st move
-				//Put 3rd X in square4
-				currentElement = document.getElementById("square11");
-				updateGameStatus(currentElement, 1, 1);					
+			// else if square4 is taken then make first move in square8
+			else {
+				currentElement = document.getElementById("square8");
+				updateGameStatus(currentElement, 8);							
 			}
 		}
 		
-		//if second X was placed in square2
-		else if (moveHistory[2] == 2) {
+		//If player has made two moves (means 3 total moves and its now computers second move)
+		else if (moveCounter == 3) {
 			
-			//if 2nd O did not use square1 to block
-			if (moveHistory[3] != 1) { 
-				//Put 3rd X in square1 for win
-				currentElement = document.getElementById("square01");
-				updateGameStatus(currentElement, 0, 1);					
-			}
-			
-			//this scenario occurs when O's first move was square3 or 6
-			else { 
-				//Put X in square8
-				currentElement = document.getElementById("square22");
-				updateGameStatus(currentElement, 2, 2);					
-			}
-		}
-		
-		//1st O in square4 (means 2nd X in square8)
-		else if (moveHistory[1] == 4) {
-			
-			//if 2nd O in square2
-			if (moveHistory[3] == 2) {
-				//Put 3rd X in square 6
-				currentElement = document.getElementById("square20");
-				updateGameStatus(currentElement, 2, 0);						
+			//check if there is an impending win for player. If so, call doWinOrBlock()			 
+			impendingWinInfo = checkForImpendingWin();
+			if (impendingWinInfo.dimension != "") {
+				doWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
 			}
 			
-			//if 2nd O in square6
-			else if (moveHistory[3] == 6) { 
-				//Put X in square2
-				currentElement = document.getElementById("square02");
-				updateGameStatus(currentElement, 0, 2);				
-			}
-			else if (moveHistory[3] == 1) { //2nd O in square01
-				currentElement = document.getElementById("square21");
-				updateGameStatus(currentElement, 2, 1);				
-			}
-			else if (moveHistory[3] == 5) { //2nd O in square12
-				currentElement = document.getElementById("square10");
-				updateGameStatus(currentElement, 1, 0);				
-			}			
-			else if (moveHistory[3] == 7) { //2nd O in square21
-				currentElement = document.getElementById("square01");
-				updateGameStatus(currentElement, 0, 1);				
-			}			
-			else if (moveHistory[3] == 3) { //2nd O in square10
-				currentElement = document.getElementById("square12");
-				updateGameStatus(currentElement, 1, 2);				
-			}			
-		}		
-		
-	}
+			//if no impending win
+			else {
+				//if computers first move was in square4
+				if (moveHistory[1] == 4) {
+					
+					//if square5 is empty then make move there to lead game to a tie
+					if (grid[5] == "") {
+						currentElement = document.getElementById("square5");
+						updateGameStatus(currentElement, 5);						
+					}
+					
+					//if square5 is not empty then make move in square2 to avoid a potential path to players win
+					else {
+						currentElement = document.getElementById("square2");
+						updateGameStatus(currentElement, 2);										
+					}
+				}
+				
+				//if player made first move in square4 then computer's first move would be in square8
+					//in case of above condition met, check if players second move was in square0. This check is
+					//done because that is the only move that still allows a path for player to win. To block
+					//that possibility, make computers second move in square6.
 	
-	//If it's time for computer's 4th or 5th move
-	else if ( (moveCounter == 6) || (moveCounter == 8) ) {
+				else if ( (moveHistory[1] == 8) && (moveHistory[2] == 0) ) {
+						currentElement = document.getElementById("square6");
+						updateGameStatus(currentElement, 6);									
+				}				
+			}
+		}
 		
-		//Call function that checks for impending win and then seek a win or block
-		checkForImpendingWin();
+		//For all other scenarios, either block a win or fill a square. The game should now lead to a tie.
+		else {
+			
+			impendingWinInfo = checkForImpendingWin();
+			if (impendingWinInfo.dimension != "") {
+				doWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
+			}
+			else {
+				squareToModify = findNextSquare();
+				
+				elementToModify = document.getElementById("square"+squareToModify);
+				
+				//Make call to updateGameStatus to put computersLetter on that square in displayed grid
+				updateGameStatus(elementToModify, squareToModify);				
+			}
+		}
 	}
 }
 
@@ -650,80 +774,76 @@ function makeExpertMove() {
 //If computer is about to win, complete the win. If player about to win, block it.
 function checkForImpendingWin() {
 	
-//First check if it's possible to complete a win
-
-	//If downdiagonal has two squares with computer's type and needs one more to win,
-	//Call function to complete the win
-	if ( (downDiagonal.type == computersLetter) && (downDiagonal.count == 2) ) {
-		doWinOrBlock("downDiagonal", 0);
-		return true;
+	//impendingWinInfo contains information that is used by function doWinOrBlock():
+	//which dimension is about to win (e.g. row, column, downDiagonal); the starting index
+	//number for that dimension; and which letter type is about to win
+	var impendingWinInfo = {dimension: "", dimensionIndex: -1, type: ""};
+	
+	//If downdiagonal has two squares of same type and needs one more to win,
+	//then return info about this diagonal
+	if ( (downDiagonal.count == 2) && (downDiagonal.type != "T" ) ) {
+		impendingWinInfo.dimension = "downDiagonal";
+		impendingWinInfo.dimensionIndex = 0; //starting square number for downdiagonal
+		impendingWinInfo.type = downDiagonal.type;
+		
+		//if downDiagonal.type is computersLetter then computer is about to win. Stop here and
+		//return info so as to allow the win to proceed
+		if (downDiagonal.type == computersLetter) {
+			return impendingWinInfo;
+		}
 	}
 
-	//Else If updiagonal has two squares with computer's type and needs one more to win,
-	//Call function to complete the win
-	else if ( (upDiagonal.type == computersLetter) && (upDiagonal.count == 2) ) {
-		doWinOrBlock("upDiagonal", 6);
-		return true;
+	//If updiagonal has two squares of same type and needs one more to win,
+	//then return info about this diagonal
+	if ( (upDiagonal.count == 2) && (upDiagonal.type != "T") ) {
+		impendingWinInfo.dimension = "upDiagonal";
+		impendingWinInfo.dimensionIndex = 6;
+		impendingWinInfo.type = upDiagonal.type;
+
+		//if upDiagonal.type is computersLetter then computer is about to win. Stop here and
+		//return info so as to allow the win to proceed
+		if (upDiagonal.type == computersLetter) {
+			return impendingWinInfo;
+		}
 	}
 	
 	//Cycle through rows, columns. 
-	else {
-		for (i=0; i<3; i++) {
-			
-				//If any row has two squares with computer's type and needs one more to win,
-				//Call function to complete the win	
-				if ( (rows[i].type == computersLetter) && (rows[i].count == 2) ) {
-					doWinOrBlock("row", i);
-					//break;
-					return true;
-				}
-
-				//If any column has two squares with computer's type and needs one more to win,
-				//Call function to complete the win	
-				if ( (columns[i].type == computersLetter) && (columns[i].count == 2) ) {
-					doWinOrBlock("column", i);
-					//break;
-					return true;
-				}
-		}		
-	}
 	
-	//If no win possible then check if there is a need to block a win by player
-
-	//If player about to win downDiagonal
-	if ( (downDiagonal.type == "O") && (downDiagonal.count == 2) ) {
-		
-		//Block that win
-		doWinOrBlock("downDiagonal", 0);
-		return true;
-	}
-	
-	//If player about to win upDiagonal
-	else if ( (upDiagonal.type == "O") && (upDiagonal.count == 2) ) {
-		//Block that win
-		doWinOrBlock("upDiagonal", 6);
-		return true;
-	}
-	else {
-		
-		//Cycle through rows and columns
-		for (i=0; i<3; i++) {
+	for (i=0; i<3; i++) {
 			
-				//If player about to win across any row, block it
-				if ( (rows[i].type == "O") && (rows[i].count == 2) ) {
-					doWinOrBlock("row", i);
-					//break;
-					return true;
-				}
+			//If any row has two squares of the same type and needs one more to win,
+			//then return info about this row
+			if ( (rows[i].count == 2) && (rows[i].type != "T") ) {
+				impendingWinInfo.dimension = "row";
+				impendingWinInfo.dimensionIndex = i;
+				impendingWinInfo.type = rows[i].type;
+				//if rows[i].type is computersLetter then computer is about to win. Stop here and
+				//return info so as to allow the win to proceed				
+				if (rows[i].type == computersLetter) {
+					return impendingWinInfo;						
+				}		
+			}
+
+			//If any column has two squares with the same type and needs one more to win,
+			//then return information about this column	
+			if ( (columns[i].count == 2) && (columns[i].type != "T") ) {
+				impendingWinInfo.dimension = "column";
+				impendingWinInfo.dimensionIndex = i;
+				impendingWinInfo.type = columns[i].type;
 				
-				//If player about to win across any column, block it
-				if ( (columns[i].type == "O") && (columns[i].count == 2) ) {
-					doWinOrBlock("column", i);
-					//break;
-					return true;
+				//if columns[i].type is computersLetter then computer is about to win. Stop here and
+				//return info so as to allow the win to proceed	
+				if (columns[i].type == computersLetter) {
+					return impendingWinInfo;						
 				}
-		}		
-	}	
+			}
+	}
+	
+	//If there was an impending win for computer then by now it has been returned.
+	//If there is an impending win for player than impendingWinInfo has information about it.
+	//If there is no impending win then impendingWinInfo has default values.
+	return impendingWinInfo;
+
 }
 
 // ---------  End Function checkForImpendingWin  ----
@@ -738,88 +858,69 @@ function checkForImpendingWin() {
 function doWinOrBlock(dimension, dimensionIndex) {
 	
 	
-	var gridIndex = 0; //Keeps track of square under question.
-	var row = 0;	
-	var column = 0;
-	
+	var squareNumber = 0; //Keeps track of square under question.	
 	
 	//squareID is used to construct a string ID to be used in document.getElementById
-	//For example, squareID may be used to construct string "square00"
-	//which is then used in a call document.getElemenyById("square00")
+	//For example, squareID may be used to construct string "square0"
+	//which is then used in a call document.getElemenyById("square0")
 	var squareID; 
 	
 	//squareToUpdate is used to reference the element that holds a letter in the displayed grid.
-	//squareToUpdate = document.getElementById("square00")
-	var squareToUpdate;
+	//squareToUpdate = document.getElementById("square0")
+	var elementToUpdate;
 	
-		/******Difference between square number and squareToUpdate******/
+		/******Difference between squareNumber and squareID******/
 		
-	//square number 5 means the 3rd square (column 2) of the second row (row 1).
-	//gridIndex refers to the square number. So square number 5 is called square5
-	//and has gridIndex = 5
-	//The squareID for this square is the string "square12"
-	//The squareToUpdate in this function refers to element (in this case the div 
+	//squareNumber 5 means the 3rd square (column 2) of the second row (row 1).
+	//The squareID for this square is the string "square5". So square5 has squareNumber = 5
+	//The elementToUpdate in this function refers to element (in this case the div 
 	//within the grid that is displayed to the player) which holds the square under focus. 
-	//So in this case squareToUpdate = document.getElementById("square12")
+	//So in this case elementToUpdate = document.getElementById("square5")
 	
 	//if the win is about to occur across a row
 	if (dimension == "row") {
 		
 		//The dimensionIndex passed as argument specifies row number e.g. row 0, 1, or 2
-		//Use dimensionIndex to calculate first square of that row and store in gridIndex
-		gridIndex = 3 * dimensionIndex;
+		//Use dimensionIndex to calculate first square of that row and store in squareNumber
+		squareNumber = 3 * dimensionIndex;
 		
-		//Move across row until you find index of blank square
-		while (grid[gridIndex] != "") {
-			gridIndex++;
+		//Move across row until you find the blank square
+		while (grid[squareNumber] != "") {
+			squareNumber++;
 		}
 		
-		//row number is the dimensionIndex passed as an argument
-		//It specifies the row number for the empty square to be populated
-		row = dimensionIndex;
+		//Construct string for squareID
+		squareID = "square" + squareNumber;
 		
-		//gridIndex is square number of empty square which must now be populated.
-		//The square number modulus 3 gives the column number. E.g. square 4 gives column 1.
-		column = gridIndex % 3;
-		
-		//Construct string for squareID using row and column of square to be populated
-		squareID = "square" + row + column;
-		
-		//get reference to the element of grid which must be populated e.g. the Div with id="square00"
-		squareToUpdate = document.getElementById(squareID);
+		//get reference to the element of grid which must be populated e.g. the Div with id="square0"
+		elementToUpdate = document.getElementById(squareID);
 		
 		//Make call to updateGameStatus to populate that element
-		updateGameStatus(squareToUpdate, row, column);
+		updateGameStatus(elementToUpdate, squareNumber);
 	}
 	
 	//if the win is about to occur across a column
 	else if (dimension == "column") {
 		
-		//move to the the top square of that column and store its number in gridIndex.
+		//move to the the top square of that column and store its number in squareNumber.
 		//dimensionIndex--passed as argument--gives that square number
-		gridIndex = dimensionIndex;
+		squareNumber = dimensionIndex;
 		
 		//Find the empty square in the column.
 		//Adding 3 to square number makes you move to the next square down the column. 
-		while (grid[gridIndex] != "") {
-			gridIndex = gridIndex + 3;
+		while (grid[squareNumber] != "") {
+			squareNumber = squareNumber + 3;
 		}
 		
-		//Dividing the square number by 3 and taking the quotient gives the row of empty
-		//square to be populated. E.g. Squares 3 through 5 divided by 3 give a quotient of 1: row1
-		row = Math.floor(gridIndex/3);
-		
-		//Column number is given to us via dimensionIndex
-		column = dimensionIndex;
-		
-		//Construct squareID using row and column calculated for empty square to be populated
-		squareID = "square" + row + column;
+	
+		//Construct squareID for empty square to be populated
+		squareID = "square" + squareNumber;
 		
 		//Get reference to empty element of grid that is to be populated
-		squareToUpdate = document.getElementById(squareID);
+		elementToUpdate = document.getElementById(squareID);
 		
 		//make Call to updateGameStatus to populate that square
-		updateGameStatus(squareToUpdate, row, column);
+		updateGameStatus(elementToUpdate, squareNumber);
 	}
 	
 	//else if the win is about to occur across downDiagonal
@@ -827,61 +928,48 @@ function doWinOrBlock(dimension, dimensionIndex) {
 		
 		//we start with the square in the first column of downDiagonal, which is square0
 		//dimensionIndex passed when dimension is downDiagonal is 0
-		//So gridIndex is set to equal dimensionIndex, which is 0
-		gridIndex = dimensionIndex;
+		//So squareNumber is set to equal dimensionIndex, which is 0
+		squareNumber = dimensionIndex;
 		
 		//find the empty square in downDiagonal
 		//Adding 4 moves us to the next square in downDiagonal. So when in square0, next is square4
-		while (grid[gridIndex] != "") {
-			gridIndex = gridIndex + 4;
+		while ( grid[squareNumber] != "" ) {
+			squareNumber = squareNumber + 4;
 		}
 		
-		//Once we have found empty square, dividing its square number (given by gridIndex)
-		//by 3 and taking quotient gives us the row number for that square
-		row = Math.floor(gridIndex/3);
-		
-		//We get column by taking gridIndex modulus 3
-		column = gridIndex % 3;
-		
-		//With row and column number now known, construct squareID
-		squareID = "square" + row + column;
+		//With square number now known, construct squareID
+		squareID = "square" + squareNumber;
 		
 		//Get reference to the element that has the empty square to be populated
-		squareToUpdate = document.getElementById(squareID);
+		elementToUpdate = document.getElementById(squareID);
 		
 		//Make call to updateGameStatus to populate that square
-		updateGameStatus(squareToUpdate, row, column);		
+		updateGameStatus(elementToUpdate, squareNumber);		
 	}
 	//if win is about to occur across upDiagonal
 	else if (dimension == "upDiagonal") {
 		
 		//we start with the square in column0 of updiagonal, which is square6
 		//Whenever dimension is upDiagonal, dimensionIndex is set to 6
-		//So set gridIndex to dimensionIndex
-		gridIndex = dimensionIndex;
+		//So set squareNumber to dimensionIndex
+		squareNumber = dimensionIndex;
 		
 		//Find the empty square in upDiagonal
-		//Subtracting 2 from gridIndex makes us move up the upDiagonal. So from square6 we subtract 2
+		//Subtracting 2 from squareNumber makes us move up the upDiagonal. So from square6 we subtract 2
 		//and move to square4
-		while (grid[gridIndex] != "") {
-			gridIndex = gridIndex - 2;
+		while (grid[squareNumber] != "") {
+			squareNumber = squareNumber - 2;
 		}
 		
-		//Upon finding empty square, dividing its gridIndex by 3 and taking quotient gives us row of
-		//empty square
-		row = Math.floor(gridIndex/3);
-		
-		//Taking the modulus of gridIndex of empty square gives us the column number
-		column = gridIndex % 3;
-		
+
 		//Construct the string for squareID
-		squareID = "square" + row + column;
+		squareID = "square" + squareNumber;
 		
 		//Get element for square in displayed grid to populate
-		squareToUpdate = document.getElementById(squareID);
+		elementToUpdate = document.getElementById(squareID);
 		
 		//Call updateGameStatus to populate the required element
-		updateGameStatus(squareToUpdate, row, column);			
+		updateGameStatus(elementToUpdate, squareNumber);			
 	}
 }
 
@@ -891,46 +979,55 @@ function doWinOrBlock(dimension, dimensionIndex) {
 
 function makeNonExpertMove() {
 	
-	var squareToModify; //the number of the square to modify
-	var squaresRow; //the row of this square
-	var squaresColumn; //the column of this square
+	var squareNumber; //the number of the square to modify
 	var elementToModify; //the div of displayed grid that holds this square
+	var impendingWinInfo = {dimension: "", dimensionIndex: -1, type: ""};
 
 	//if it's computer's first move regardless of who goes first
-	//Currently computer always goes first but future iterations will allow user
-	//to also go first
 	if (moveCounter < 2) {
 		
 		//if square0 is empty then make move there
 		if (grid[0] == "") {
-			elementToModify = document.getElementById('square00');
-			updateGameStatus(elementToModify, 0, 0);
+			elementToModify = document.getElementById('square0');
+			updateGameStatus(elementToModify, 0);
 		}
 		
 		//if square0 not empty then make move in square 2
 		else {
-			elementToModify = document.getElementById('square02');
-			updateGameStatus(elementToModify, 0, 2);			
+			elementToModify = document.getElementById('square2');
+			updateGameStatus(elementToModify, 2);			
+		}	
+	}
+	
+	//if moveCounter==2 then no impendingWin can be possible. Don't waste time checking.
+	else if ((moveCounter == 2) && (currentLetter == computersLetter) ) {
+
+		squareNumber = findNextSquare();	
+		elementToModify = document.getElementById("square"+squareNumber);
+			
+		//Make call to square click to put computersLetter on that square in displayed grid
+		updateGameStatus(elementToModify, squareNumber);		
+	}
+	
+	//For all other scenarios
+	else {
+
+		//first check if there is an impending win. If so, complete computer's win or block players win		
+		impendingWinInfo = checkForImpendingWin();
+		if (impendingWinInfo.dimension != "") {
+			doWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
 		}
-		
-		//If it is past computer's first move
-		//First check if there is an impending win. This check automatically plays
-		//to complete the computers win or block the players win
-	} else if ( (moveCounter < 4) || (!checkForImpendingWin()) ) {
-		
-			//There is no win possible when moveCounter < 4 so don't spend time checking
-			//for impending win. So if moveCounter < 4 OR it is not an impending win
-			//then find the square to modify.
+		else {
+			//if there is no impending win then find next square
+
+			squareNumber = findNextSquare();
 			
-			squareToModify = findNextSquare();
-			
-			//Calculate row and column of this square, get div of displayed grid to modify
-			squaresRow = Math.floor(squareToModify/3);
-			squaresColumn = squareToModify%3;
-			elementToModify = document.getElementById("square"+squaresRow+squaresColumn);
+			elementToModify = document.getElementById("square"+squareNumber);
 			
 			//Make call to square click to put computersLetter on that square in displayed grid
-			updateGameStatus(elementToModify, squaresRow, squaresColumn);
+			updateGameStatus(elementToModify, squareNumber);			
+
+		}
 	}
 }
 
@@ -942,11 +1039,13 @@ function makeNonExpertMove() {
 
 function findNextSquare() {
 	
+	var emptySquare = -1;
+	
 	//Go through the squares of the grid
 	for (i=0; i<9; i++) {
 		
-		//If difficulty level is 1 (moderate difficulty)
-		if (difficultyLevel == 1) {
+		//If difficulty level is 1 (moderate difficulty) or 2 (expert)
+		if (difficultyLevel >0) {
 			
 			//Look for a square that has computersLetter in it then try to find an empty square
 			//that is adjacent to it.
@@ -1003,16 +1102,22 @@ function findNextSquare() {
 				}			
 			}
 			
-			//If nothing matches above and move counter is 8 then it means only one square empty.
-			//If current square empty, return that square.
-			else if ( (moveCounter == 8) && (grid[i] =="") ) {
-				return i;
+			//If nothing matches above then record this square as being empty in case we need to come
+			//back to it if there is no other move possible.
+			else if (grid[i] == "") {
+				emptySquare = i;
 			}			
 		}
 		//if difficulty level is 0 (novice difficulty) then return the first blank square found
 		else if (grid[i] == "")
 				return i;
 	}
+	
+	//We will reach this point only after completing for loop to cycle through all squares
+	//for difficultyLevel 1 or 2 and not finding an empty square adjacent to a square occupied by
+	//computersLetter. So no moves possible to make the next move next to a previously made move.
+	//In this case, make a move in an empty square. So return  value stored in emptySquare in for loop
+	return emptySquare;
 }
 
 // ---------  End Function findNextSquare  ----
@@ -1066,11 +1171,20 @@ function closeModal() {
 
 //Does reset to prepare for a new game. Does not flush record of wins and losses.
 function reset() {
+	
+	var squareNumber = 0;
 
-	//X will make the first move regardless of player mode
-	currentLetter = "X";
+	//toggle who goes first in next game
+	if (computerGoesFirst) {
+		currentLetter = "X";
+		computerGoesFirst = false;
+	}
+	else {
+		currentLetter = "O";
+		computerGoesFirst = true;
+	}
 
-	//reset globals used to determine if game over	
+	//reset the globals used to determine if game over	
 	moveCounter = 0;
 	gameOver = false;
 	
@@ -1087,11 +1201,13 @@ function reset() {
 		//Use another counter to cycle through each square of a row
 		for (j=0; j<3; j++) {
 			
+			squareNumber = i*3 + j;
+			
 			//Make sure its reset to be blank on grid
-			document.getElementById("square"+i+j).innerHTML = "";
+			document.getElementById("square"+squareNumber).innerHTML = "";
 			
 			//Reset arrays for grid and moveHistory
-			grid[i*3 + j] = "";
+			grid[squareNumber] = "";
 			moveHistory[i*3 + j] = "";
 		}
 	}
