@@ -565,208 +565,173 @@ function makeMove() {
 
 // ---------  Begin Function makeExpertMove  ----
 
-//Function to calculate and make computer's move in playComputer mode
-//Difficulty level set to expert
 function makeExpertMove() {
-
+	
 	var squareToModify; //the number of the square to modify
 	var impendingWinInfo = {dimension: "", dimensionIndex: -1, type: ""};
+	var squareThatTraps = -1;
 
-	if (computerGoesFirst) {
-		//computers first move is in square0 as done in setUpToPlayComputer()
-		//For computer's 2nd, and 3rd move, use program author's strategy to seek win or tie
-		//based on where player puts the O's in their moves
-	
-	
-		//In this condition, computer goes first. If move counter is 2 then it's computer's second move.
-		if (moveCounter == 2) {
-	
-			//moveHistory[1] tells where O made their first move. If O's first move is in
-			//squares 1, 2, 5, 7, or 8
-			if ( 	(moveHistory[1] == 1) || (moveHistory[1] == 2) || (moveHistory[1] == 5) ||
-						(moveHistory[1] == 7) || (moveHistory[1] == 8)
-				 )
-				 { //put 2nd X in square6
+	//If player goes first and it's computer's first move (moveCounter == 1) or
+	//If computer goes first and it's computer's second move (moveCounter == 2)
+	if (moveCounter < 3) {
+		
+		if (computerGoesFirst) {
+			
+			//If it is computer's second move
+		
+			//If player put O in square4 then put X in square8
+			if (grid[4] == playersLetter)
+				squareToModify = 8;
+					
+			//If player put O in square1 or square7 then put X in square6.	
+			else if ( (columns[1].type == playersLetter) || (grid[2] == playersLetter) )
 				squareToModify = 6;
-			}
-			
-			//If O's 1st move is square 3 or 6
-			else if ( 	(moveHistory[1] == 3) || (moveHistory[1] == 6) ) { 
-				//put 2nd X in square 2
+					
+			//For all other scenarios put X in square2	
+			else
 				squareToModify = 2;
-			}
-	
-			//If O's first move is square4
-			else if (moveHistory[1] == 4) { 
-				//Put second X in square8
-				squareToModify = 8;
-			}		
-			
 		}
-		
-		// If it's time for computer's 3rd move
-		else if (moveCounter == 4) { 
-			
-			//If computer's second move used square6
-			if (moveHistory[2] == 6) { 
-				
-				//if O's 2nd move did not block by using square3
-				if (moveHistory[3] != 3) { 
-					//then put 3rd X in square3 for win
-					squareToModify = 3;									
-				}
-				
-				//If O used square 1 or 2 for its 1st move
-				//( <=2 means 1 or 2 since computer has already taken square 0)
-				else if (moveHistory[1] <= 2) { 
-					//then put 3rd X in square8
-					squareToModify = 8;
-				}
-				
-				//if O used square7 or 8 for its 1st move
-				else if (moveHistory[1] > 6) { 
-					//Put 3rd X in square2
-					squareToModify = 2;
-				}
-				else if (moveHistory[1] == 5) { //if O used square5 for its 1st move
-					//Put 3rd X in square4
-					squareToModify = 4;
-				}
-			}
-			
-			//if second X was placed in square2
-			else if (moveHistory[2] == 2) {
-				
-				//if 2nd O did not use square1 to block
-				if (moveHistory[3] != 1) { 
-					//Put 3rd X in square1 for win
-					squareToModify = 1;
-				}
-				
-				//this scenario occurs when O's first move was square3 or 6
-				else { 
-					//Put X in square8
-					squareToModify = 8;
-				}
-			}
-			
-			//if 1st O in square4 (means 2nd X would have been put in square8 per code above)
-			else if (moveHistory[1] == 4) {
-				
-				//if 2nd O in square2
-				if (moveHistory[3] == 2) {
-					//Put 3rd X in square 6
-					squareToModify = 6;
-				}
-				
-				//if 2nd O in square6
-				else if (moveHistory[3] == 6) { 
-					//Put X in square2
-					squareToModify = 2;
-				}
-				else if (moveHistory[3] == 1) { //2nd O in square1
-					//put X in square7
-					squareToModify = 7;
-				}
-				else if (moveHistory[3] == 5) { //2nd O in square5
-					//Put X in square3
-					squareToModify = 3;
-				}			
-				else if (moveHistory[3] == 7) { //2nd O in square7
-					//Put X in square1
-					squareToModify = 1;
-				}			
-				else if (moveHistory[3] == 3) { //2nd O in square3
-					//Put X in square5
-					squareToModify = 5;
-				}			
-			}		
-			
-		}
-		
-		//If it's time for computer's 4th or 5th move
-		else if ( (moveCounter == 6) || (moveCounter == 8) ) {
-			
-			//Call function that checks for impending win and then seek a win or block
-			impendingWinInfo = checkForImpendingWin();
-			if (impendingWinInfo.dimension != "") {
-				//doWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
-				squareToModify = findSquareForWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
-			}
-			else {
-				squareToModify = findNextSquare();
-			}
-		}
-	}
-	
-	//else player has gone first.
-	else {
-		
-		//If player has made only one move so far
-		if (moveCounter == 1) {
-			
-			//if square4 is empty then make first move there.
-			if (grid[4] == "") {
-				squareToModify = 4;
-			}
-			// else if square4 is taken then make first move in square8
-			else {
-				squareToModify = 8;
-			}
-		}
-		
-		//If player has made two moves (means 3 total moves and its now computers second move)
-		else if (moveCounter == 3) {
-			
-			//check if there is an impending win for player. If so, call doWinOrBlock()			 
-			impendingWinInfo = checkForImpendingWin();
-			if (impendingWinInfo.dimension != "") {
-				squareToModify = findSquareForWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
-			}
-			
-			//if no impending win
-			else {
-				//if computers first move was in square4
-				if (moveHistory[1] == 4) {
-					
-					//if square5 is empty then make move there to lead game to a tie
-					if (grid[5] == "") {
-						squareToModify = 5;
-					}
-					
-					//if square5 is not empty then make move in square2 to avoid a potential path to players win
-					else {
-						squareToModify = 2;
-					}
-				}
-				
-				//if player made first move in square4 then computer's first move would be in square8
-					//in case of above condition met, check if players second move was in square0. This check is
-					//done because that is the only move that still allows a path for player to win. To block
-					//that possibility, make computers second move in square6.
-	
-				else if ( (moveHistory[1] == 8) && (moveHistory[2] == 0) ) {
-						squareToModify = 6;
-				}				
-			}
-		}
-		
-		//For all other scenarios, either block a win or fill a square. The game should now lead to a tie.
+
+		//else player has gone first.
 		else {
 			
-			impendingWinInfo = checkForImpendingWin();
-			if (impendingWinInfo.dimension != "") {
-				squareToModify = findSquareForWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
-			}
-			else {
-				squareToModify = findNextSquare();			
-			}
+			//If player has made only one move so far
+				
+			//if square4 is empty then make first move there.
+			if (grid[4] == "")
+				squareToModify = 4;			
+			// else if square4 is taken then make first move in square8
+			else
+				squareToModify = 8;							
+		}
+	}	
+	
+	//Next Check for a condition that can lead to computer to be trapped.
+	//If player goes first and sandwiches computer in a diagonal then grid will look like
+	//
+	//  O
+	//     X
+	//        O
+	//
+	//In this situation, the check for trap algorithm would cause computer to use square6, which will
+	//cause computer to become trapped on player's next move.
+	
+	//if player went first and three moves have happend then it's computer's second move.
+	//If computer's first move was in square4
+	else if ( (moveCounter == 3) && (!computerGoesFirst) && (grid[4] == computersLetter) &&
+						(
+							( (grid[0] == playersLetter) && (grid[8] == playersLetter) ) || //check downDiagonal
+							( (grid[2] == playersLetter) && (grid[6] == playersLetter) ) //check upDiagonal						
+						)
+					) {						
+							//If all conditions above true then deviate from algorithm and use square5 to avoid trap on
+							//player's next move.
+							squareToModify = 5;
+	}
+	
+	//For all other scenarios
+	else {
+			
+		impendingWinInfo = checkForImpendingWin();
+			
+		if (impendingWinInfo.dimension != "")
+			squareToModify = findSquareForWinOrBlock(impendingWinInfo.dimension, impendingWinInfo.dimensionIndex);
+			
+		else {
+				
+			squareThatTraps = checkForImpendingTrap();
+				
+			if (squareThatTraps != -1)
+				squareToModify = squareThatTraps;
+			else
+				squareToModify = findNextSquare();							
 		}
 	}
-	updateGameStatus(squareToModify);
+	
+	//Make call to updateGameStatus to put computersLetter on that square in displayed grid
+	updateGameStatus(squareToModify);	
+	
 }
 
 // ---------  End Function makeExpertMove  ----
+
+
+// ---------  Begin Function checkForImpendingTrap  ----
+
+
+//Function to check if next move could result in a trap. A trap is a move that creates two simultaneous
+//paths to victory. Opponent can block only one path in their next move and is trapped into defeat.
+function checkForImpendingTrap() {
+	
+	var squareToReturn = -1;
+	
+	for (squareNumber=0; squareNumber<grid.length; squareNumber++) {
+		
+		//Do the check only if square is empty
+		if (grid[squareNumber] == "") {
+
+			//First check if computer can create trap with this square. If so, return squareNumber to proceed with trap.			
+			if (checkIfSquareTraps(squareNumber, computersLetter))
+				return squareNumber;
+
+		//Next check if player can trap with this square. If so, note it down to block it if computer can't set trap
+		//after checking all squares.
+			if (checkIfSquareTraps(squareNumber, playersLetter))
+				squareToReturn = squareNumber;
+			
+		}	
+	}
+	
+	//If an impending player trap was found then squareToReturn has that. In no traps found then it is -1.
+	return squareToReturn;
+
+}
+
+// ---------  End Function checkForImpendingTrap  ----
+
+
+// ---------  Begin Function checkIfSquareTraps  ----
+
+function checkIfSquareTraps(square, letter) {
+	
+	var score = 0; //keeps track of number of paths to impending victory by playing this square
+	const rowNumberForSquare = getRowNumberForSquare(square);
+	const colNumberForSquare = getColNumberForSquare(square);
+	
+	//if row for this square is already of this letter's type and only one square of row is used
+	//Then playing this square will create an impending victory in this row.
+	if ( (rows[rowNumberForSquare].type == letter) && (rows[rowNumberForSquare].count == 1) ) {
+		score++;
+	}
+
+	//if col for this square is already of this letter's type and only one square of col is used
+	//Then playing this square will create an impending victory in this column.	
+	if ( (columns[colNumberForSquare].type == letter) && (columns[colNumberForSquare].count == 1) ) {
+		score++;
+	}
+
+	//if this square is onDownDiagnoal, already of this letter's type, and only one square of diagonal is used
+	//Then playing this square will create an impending victory in this diagonal.	
+	if ( (onDownDiagonal(square)) && (downDiagonal.type == letter) && (downDiagonal.count == 1) ) {
+		score++;
+	}
+
+	//if this square is onUpDiagnoal, already of this letter's type, and only one square of diagonal is used
+	//Then playing this square will create an impending victory in this diagonal.		
+	if ( (onUpDiagonal(square)) && (upDiagonal.type == letter) && (upDiagonal.count == 1) ) {
+		score++;
+	}
+	
+	//Score represents number of paths to impending victory which can be created by playing this square
+	//If score > 1 then trap is possible so return true. Else return false.
+	if (score > 1)
+		return true;
+	else
+		return false;
+}
+
+// ---------  End Function checkIfSquareTraps  ----
+
 
 // ---------  Begin Function checkForImpendingWin  ----
 
