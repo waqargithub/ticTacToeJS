@@ -4,10 +4,13 @@
 	var xWins = 0;
 	var oWins = 0;
 	var ties = 0;
-
+	
+	//Letter assigned to computer in play computer mode. Currently hardwired to X but future may allow player to chooses.
+	var computersLetter = "";		
+	var playersLetter = ""; //Currently hardwired to O.
 	var currentLetter = ""; //Letter to be placed on grid in the next move
-	var computersLetter = "";		//Letter assigned to computer in play computer mode
-	var playersLetter = "";
+	
+	var firstGame = true; //used to appropriately set variables in setUpToPlayComputer
 	var computerGoesFirst = false; //used to track turns for who goes first
 	
 	var gameOver = false; //Used to prevent any moves after game is over
@@ -27,11 +30,12 @@
 	var grid = new Array(9).fill("");		
 	
 	
-	//An array of three objects. Each object describes the current status of corresponding row.
+	//An array of three objects to track state of each row.
+	//Row type = 'X' means rows has one or more 'X' and no 'O'. Type = 'O' has similar mmeaning.
+	//Type = 'T' means row has both 'X' and 'Y', which means no win possible in this row.
 	//When a letter is placed in empty row, that row is given type of that letter and its count set to 1
-	//to track that only one of that letter is in that row. When a second of the same type of letter
-	//placed in a row, type stays unchanged and count increments to 2, and, on third time, to 3.
-	//When a letter is placed in a row that already has the opposite letter--type of row is
+	//When a second of the same type of letter placed in a row, type stays unchanged and count increments to 2,
+	//and, on third time, to 3. When a letter is placed in a row that already has the opposite letter--type of row is
 	//different than current letter--then row given a type = T for tie.
 	var rows = [
 				{type: "", count: 0},
@@ -46,18 +50,18 @@
 				{type: "", count: 0}
 				 ];
 
-	//Keep track of type and count for downDiagonal--diagonal from square0 to 22	
+	//Keep track of type and count for downDiagonal--diagonal from square0 to 8	
 	var downDiagonal = {type: "", count: 0};
 
-	//Keep track of type and count for upDiagonal--diagonal from square6 to 02	
+	//Keep track of type and count for upDiagonal--diagonal from square6 to 2	
 	var upDiagonal = {type: "", count: 0};
 	
 	//Stores player mode. Used to determine when playing against computer and when
 	//program should make a move
 	var playerMode = "";
 	
-	//Set to novice or expert by user upon selecting playComputer mode
-	//Affects whether move made by computer are for novice or expert player
+	//User selects one of three levels ranging from novice to expert by user upon selecting playComputer mode
+	//Affects algorithm used to calculate computer's move.
 	var difficultyLevel = "";
 
 //--------------  End Global variables  ---------------
@@ -76,10 +80,7 @@ function getPlayerMode() {
 
 	//if two players playing each other, return the mode and set current letter to X
 	if (document.getElementById("2playersHere").checked == true) {
-		currentLetter = "X";
-		
-		//Display whose move it is
-	  updateCaption(currentLetter+"'s move.");		
+		setUp2PlayersHere();
 		return "2playersHere";
 	}
 	
@@ -87,12 +88,6 @@ function getPlayerMode() {
 	//play computer, get difficulty level from range
 	else if (document.getElementById("playComputer").checked == true) {
 		difficultyLevel = document.getElementById("difficultyLevelRange").value;
-		
-		//Let player go first except in expert mode
-		if (difficultyLevel < 2)
-			computerGoesFirst = false;
-		else
-			computerGoesFirst = true;			
 		setUpToPlayComputer();
 		return "playComputer";
 	}
@@ -114,13 +109,23 @@ function setUp2PlayersHere() {
 	
 	//Hide difficulty level selector if 2 players here
 	document.getElementById('difficultyLevelDiv').style.display = "none";
+	currentLetter = "X";
+		
+	//Display whose move it is
+	updateCaption(currentLetter+"'s move.");			
 }
 
-// ---------  Begin Function dispalyDifficultyLevelSwitch  -----
+// --------------- End Function setup2PlayersHere ------------
+
+
+// ---------  Begin Function updateCaption  -----
 
 function updateCaption(newCaption) {
 	document.getElementById("gameCaption").innerHTML = newCaption;
 }
+
+// ---------  End Function updateCaption  -----
+
 
 // ---------  Begin Function dispalyDifficultyLevelSwitch  -----
 
@@ -147,38 +152,40 @@ function setUpToPlayComputer() {
 		computersLetter = "X"; //Computer takes X.
 		playersLetter = "O";
 		
-		//If computer goes first then make first move and update all variables.
+
+		if (firstGame) {
+			//Let player go first except in expert mode
+			//This function is called each time a new game against computer starts. Set these values only once.
+			if (difficultyLevel < 2)
+				computerGoesFirst = false;
+			else {
+				computerGoesFirst = true;
+			}
+			firstGame = false;
+		}
+		else {
+			//toggle who goes first in next game
+			if (computerGoesFirst) {
+				computerGoesFirst = false;
+			}
+			else {
+				computerGoesFirst = true;
+			}	
+		}				
+		
+		//If computer goes first, set currentLetter and make first move in square0.
 		if (computerGoesFirst) {
-			//To make first move, set square0 to computer's letter, which is X
-			document.getElementById("square0").innerHTML = computersLetter;
+					
+			currentLetter = computersLetter;
+			updateGameStatus(0);
 			
-			//Record that the first move occupied square0
-			moveHistory[0] = 0;
-			
-			//Record that square0 has X
-			grid[0] = computersLetter;
-			
-			//increment count of moves
-			moveCounter++;
-			
-			//Since first move in square0, set row 0 count to 1, type to X
-			rows[0].count = 1;
-			rows[0].type = computersLetter;
-			
-			//Since first move in square0, set column 0 count to 1, type to X
-			columns[0].count = 1;
-			columns[0].type = computersLetter;
-			
-			//Since first move in square0, set downDiagonal count to 1, type to X		
-			downDiagonal.count = 1;
-			downDiagonal.type = computersLetter;			
 		}
 
 		
-		//Set up for players's move. Set current letter--the move about to occur--to O.
+		//Set up for players's move. Set current letter--the move about to occur--to playersLetter.
 		currentLetter = playersLetter; 
 
-		//update whose move it is
+		//update caption for whose move it is
 	  updateCaption("Computer is X. " + currentLetter+"'s move.");
 		
 }
@@ -206,7 +213,7 @@ function openModal() {
 // ---------  Begin Function updateGameStatus  --------------
 
 //Function called when player clicks a square, or when computer makes move
-//to put a letter on grid. Arguments: element is square/div to which letter will be written.
+//to put a letter on grid. Arguments:
 //SquareNumber is index of square to be modified.
 //First row has squares  0 1 2
 //Second row has squares 3 4 5
@@ -215,7 +222,7 @@ function openModal() {
 function updateGameStatus(squareNumber) {
 	
 	//Proceed only if element holding square is empty and game not over
-	if ( (grid[squareNumber] == "") && (gameOver == false) ) {
+	if ( (grid[squareNumber] == "") && (!gameOver) ) {
 		
 		//Construct string for squareID
 		squareID = "square" + squareNumber;
@@ -260,6 +267,8 @@ function writeCurrentLetterToGrid(element) {
 // ---------  Begin Function getRowNumberForSquare
 
 function getRowNumberForSquare(squareNumber) {
+	//Given square number, return the row that corresponds with it. Rows are 0, 1, 2 from top.
+	//Eg. Square4 is in second row so return row = 1.
 	return (Math.floor(squareNumber/3));
 }
 
@@ -269,6 +278,7 @@ function getRowNumberForSquare(squareNumber) {
 // ---------  Begin Function getColNumberForSquare
 
 function getColNumberForSquare(squareNumber) {
+	//Return the column in which squareNumber falls. Columns are number 0, 1, 2 from left.
 	return (squareNumber%3);
 }
 
@@ -380,6 +390,7 @@ function updateGameVariables(squareNumber) {
 	//All variables are now updated.
 	
 	//Toggle letter to prepare for next move
+	//Using X and O instead of computersLetter since this code also applies to two player mode
 	if (currentLetter == "X")
 		currentLetter = "O";
 	else
@@ -500,10 +511,6 @@ function checkGameOver(squareNumber) {
 	//If a winner has been found
 	if (winner != "") {
 
-		//Change font size and color of caption to announce win
-		document.getElementById("gameCaption").style.color = "#FFFFFF";
-		document.getElementById("gameCaption").style.fontSize = "x-large";
-		
 		//if X won, increment count of X wins, announce X's win in caption
 		if (winner == "X") {
 			xWins++;
@@ -523,8 +530,16 @@ function checkGameOver(squareNumber) {
 			ties++;
 			document.getElementById("gameCaption").innerHTML = "It's a tie!";
 		}
+		
+		//Change font size and color of caption to announce win
+		document.getElementById("gameCaption").style.color = "#FFFFFF";
+		document.getElementById("gameCaption").style.fontSize = "x-large";		
+		
 		//Update stat table showing number of X wins, O wins, and ties and display it.
-		updateStatsTable();		
+		updateStatsTable();
+		
+		//Display button to play again beneath stats
+		document.getElementById("playAgainButton").style.display = "block";	
 	}
 }
 
@@ -533,13 +548,17 @@ function checkGameOver(squareNumber) {
 
 // ---------  Begin Function updateStatsTable  ----
 
-//Update cells showing counts of win and ties using corresponding values of global variables.
+
 function updateStatsTable() {
-	document.getElementById("statsTable").style.display = "block";
-	document.getElementById("playAgainButton").style.display = "block";
+
+	//Update cells showing counts of win and ties using corresponding values of global variables.
 	document.getElementById('xWinsCell').innerHTML = xWins;
 	document.getElementById('oWinsCell').innerHTML = oWins;
-	document.getElementById('tiesCell').innerHTML = ties;	
+	document.getElementById('tiesCell').innerHTML = ties;
+	
+	//Display table
+	document.getElementById("statsTable").style.display = "block";	
+	
 }
 
 // ---------  End Function updateStatsTable  ----
@@ -583,7 +602,7 @@ function makeExpertMove() {
 			if (grid[4] == playersLetter)
 				squareToModify = 8;
 					
-			//If player put O in square1 or square7 then put X in square6.	
+			//If player put O in square1 or square7 or square2 then put X in square6.	
 			else if ( (columns[1].type == playersLetter) || (grid[2] == playersLetter) )
 				squareToModify = 6;
 					
@@ -620,8 +639,8 @@ function makeExpertMove() {
 	//If computer's first move was in square4
 	else if ( (moveCounter == 3) && (!computerGoesFirst) && (grid[4] == computersLetter) &&
 						(
-							( (grid[0] == playersLetter) && (grid[8] == playersLetter) ) || //check downDiagonal
-							( (grid[2] == playersLetter) && (grid[6] == playersLetter) ) //check upDiagonal						
+							( (grid[0] == playersLetter) && (grid[8] == playersLetter) ) || //check downDiagonal for sandwich
+							( (grid[2] == playersLetter) && (grid[6] == playersLetter) ) //check upDiagonal for sandwich						
 						)
 					) {						
 							//If all conditions above true then deviate from algorithm and use square5 to avoid trap on
@@ -1054,6 +1073,7 @@ function closeModal() {
 	xWins = 0;
 	oWins = 0;
 	ties = 0;
+	firstGame = true;
 	
 	//Hide stats table.
 	document.getElementById("statsTable").style.display = "none";
@@ -1081,17 +1101,7 @@ function reset() {
 	
 	var squareNumber = 0;
 
-	//toggle who goes first in next game
-	if (playerMode == "playComputer") {
-		if (computerGoesFirst) {
-			currentLetter = computersLetter;
-			computerGoesFirst = false;
-		}
-		else {
-			currentLetter = playersLetter;
-			computerGoesFirst = true;
-		}		
-	}
+
 
 
 	//reset the globals used to determine if game over	
